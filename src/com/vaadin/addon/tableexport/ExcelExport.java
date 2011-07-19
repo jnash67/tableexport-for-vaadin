@@ -243,7 +243,6 @@ public class ExcelExport extends TableExport {
      * 
      * Code obtained from: http://vaadin.com/forum/-/message_boards/view_message/159583
      * 
-     * 
      * @return true, if successful
      */
     @Override
@@ -253,8 +252,10 @@ public class ExcelExport extends TableExport {
             tempFile = File.createTempFile("tmp", ".xls");
             final FileOutputStream fileOut = new FileOutputStream(tempFile);
             workbook.write(fileOut);
-            return super.sendConvertedFileToUser(table.getApplication(), tempFile, exportFileName,
-                    EXCEL_MIME_TYPE);
+            if (null == mimeType) {
+                setMimeType(EXCEL_MIME_TYPE);
+            }
+            return super.sendConvertedFileToUser(table.getApplication(), tempFile, exportFileName);
         } catch (final IOException e) {
             return false;
         }

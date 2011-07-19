@@ -18,6 +18,8 @@ public abstract class TableExport implements Serializable {
     /** The window to send the export result */
     protected String exportWindow = "_self";
 
+    protected String mimeType;
+
     public TableExport(final Table table) {
         this.table = table;
     }
@@ -47,11 +49,17 @@ public abstract class TableExport implements Serializable {
      */
     public boolean sendConvertedFileToUser(final Application app, final File fileToExport,
             final String exportFileName, final String mimeType) {
+        setMimeType(mimeType);
+        return sendConvertedFileToUser(app, fileToExport, exportFileName);
+
+    }
+
+    protected boolean sendConvertedFileToUser(final Application app, final File fileToExport,
+            final String exportFileName) {
         TemporaryFileDownloadResource resource;
         try {
             resource =
-                    new TemporaryFileDownloadResource(app, exportFileName,
-                            "application/vnd.ms-excel", fileToExport);
+                    new TemporaryFileDownloadResource(app, exportFileName, mimeType, fileToExport);
             app.getMainWindow().open(resource, exportWindow);
         } catch (final FileNotFoundException e) {
             return false;
@@ -65,6 +73,14 @@ public abstract class TableExport implements Serializable {
 
     public void setExportWindow(final String exportWindow) {
         this.exportWindow = exportWindow;
+    }
+
+    public String getMimeType() {
+        return this.mimeType;
+    }
+
+    public void setMimeType(final String mimeType) {
+        this.mimeType = mimeType;
     }
 
 }
