@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Implementation-Title: TableExport
+Implementation-Version: 1.1.3
+Vaadin-Package-Version: 1
+Class-Path: 
+
