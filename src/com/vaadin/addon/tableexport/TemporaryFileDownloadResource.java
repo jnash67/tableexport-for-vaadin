@@ -91,6 +91,7 @@ public class TemporaryFileDownloadResource extends StreamResource {
          * 
          * @see com.vaadin.terminal.StreamResource.StreamSource#getStream()
          */
+        @Override
         public InputStream getStream() {
             return inputStream;
         }

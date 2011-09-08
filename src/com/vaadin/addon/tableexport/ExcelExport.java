@@ -26,6 +26,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
 
 /**
  * The Class ExcelExport. Implementation of TableExport to export Vaadin Tables to Excel .xls files.
@@ -393,7 +394,7 @@ public class ExcelExport extends TableExport {
                 addDataRow(hierarchicalTotalsSheet, rootId, localRow);
             }
             if (count > 1) {
-                sheet.groupRow(localRow + 1, localRow + count - 1);
+                sheet.groupRow(localRow + 1, (localRow + count) - 1);
                 sheet.setRowGroupCollapsed(localRow + 1, true);
             }
             localRow = localRow + count;
@@ -419,7 +420,7 @@ public class ExcelExport extends TableExport {
             addDataRow(sheetToAddTo, itemId, localRow);
             count = 1;
             if (count > 1) {
-                sheet.groupRow(localRow + 1, localRow + count - 1);
+                sheet.groupRow(localRow + 1, (localRow + count) - 1);
                 sheet.setRowGroupCollapsed(localRow + 1, true);
             }
             localRow = localRow + count;
@@ -466,13 +467,37 @@ public class ExcelExport extends TableExport {
     protected void addDataRow(final Sheet sheetToAddTo, final Object rootItemId, final int row) {
         final Row sheetRow = sheetToAddTo.createRow(row);
         Property prop;
+        Object propId;
+        String vaadinAlignment;
         Object value;
         Cell sheetCell;
         for (int col = 0; col < propIds.size(); col++) {
+            propId = propIds.get(col);
+            if (table.getColumnGenerator(propId) != null) {
+                final ColumnGenerator tcg = table.getColumnGenerator(propId);
+                if (tcg instanceof ExportableColumnGenerator) {
+                    prop =
+                            ((ExportableColumnGenerator) tcg).getGeneratedProperty(rootItemId,
+                                    propId);
+                    value = prop.getValue();
+                } else {
+                    prop = null;
+                    value = null;
+                }
+            } else {
+                prop = container.getContainerProperty(rootItemId, propId);
+                value = prop.getValue();
+            }
             sheetCell = sheetRow.createCell(col);
             sheetCell.setCellStyle(getDataStyle(rootItemId, row, col));
-            prop = container.getContainerProperty(rootItemId, propIds.get(col));
-            value = prop.getValue();
+            vaadinAlignment = this.table.getColumnAlignment(propId);
+            if (Table.ALIGN_LEFT.equals(vaadinAlignment)) {
+                sheetCell.getCellStyle().setAlignment(CellStyle.ALIGN_LEFT);
+            } else if (Table.ALIGN_RIGHT.equals(vaadinAlignment)) {
+                sheetCell.getCellStyle().setAlignment(CellStyle.ALIGN_RIGHT);
+            } else {
+                sheetCell.getCellStyle().setAlignment(CellStyle.ALIGN_CENTER);
+            }
             if (null != value) {
                 if (!isNumeric(prop.getType())) {
                     sheetCell.setCellValue(createHelper.createRichTextString(prop.getValue()

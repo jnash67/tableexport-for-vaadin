@@ -77,6 +77,7 @@ public class TableExportApplication extends Application {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
 
+            @Override
             public void buttonClick(final ClickEvent event) {
                 if (!"".equals(sheetNameField.getValue().toString())) {
                     excelExport = new ExcelExport(table, sheetNameField.getValue().toString());
@@ -99,6 +100,7 @@ public class TableExportApplication extends Application {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
 
+            @Override
             public void buttonClick(final ClickEvent event) {
                 if (!"".equals(sheetNameField.getValue().toString())) {
                     excelExport =
