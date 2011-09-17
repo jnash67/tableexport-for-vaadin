@@ -5,13 +5,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -81,12 +85,14 @@ public class ExcelExport extends TableExport {
 
     /** The POI cell creation helper. */
     protected CreationHelper createHelper;
+    protected DataFormat dataFormat;
 
     /**
      * Various styles that are used in report generation. These can be set by the user if the
      * default style is not desired to be used.
      */
     protected CellStyle dataStyle, totalsStyle, columnHeaderStyle, titleStyle;
+    protected Short dateDataFormat, doubleDataFormat;
 
     /**
      * The default row header style is null and, if row headers are specified with
@@ -98,6 +104,7 @@ public class ExcelExport extends TableExport {
     /** The totals row. */
     protected Row titleRow, headerRow, totalsRow;
     protected Row hierarchicalTotalsRow;
+    protected Map<Object, String> propertyExcelFormatMap = new HashMap<Object, String>();
 
     /**
      * At minimum, we need a Table to export. Everything else has default settings.
@@ -186,6 +193,9 @@ public class ExcelExport extends TableExport {
         workbook = new HSSFWorkbook();
         sheet = workbook.createSheet(sheetName);
         createHelper = workbook.getCreationHelper();
+        dataFormat = workbook.createDataFormat();
+        dateDataFormat = defaultDateDataFormat(workbook);
+        doubleDataFormat = defaultDoubleDataFormat(workbook);
         dataStyle = defaultDataStyle(workbook);
         totalsStyle = defaultTotalsStyle(workbook);
         columnHeaderStyle = defaultHeaderStyle(workbook);
@@ -331,15 +341,18 @@ public class ExcelExport extends TableExport {
     protected void addHeaderRow(final int row) {
         headerRow = sheet.createRow(row);
         Cell headerCell;
+        Object propId;
         headerRow.setHeightInPoints(40);
         for (int col = 0; col < propIds.size(); col++) {
+            propId = propIds.get(col);
             headerCell = headerRow.createCell(col);
-            headerCell.setCellValue(createHelper.createRichTextString(table.getColumnHeader(
-                    propIds.get(col)).toString()));
+            headerCell.setCellValue(createHelper.createRichTextString(table.getColumnHeader(propId)
+                    .toString()));
             headerCell.setCellStyle(getColumnHeaderStyle(row, col));
+            headerCell.getCellStyle().setAlignment(
+                    vaadinAlignmentToCellAlignment(this.table.getColumnAlignment(propId)));
         }
     }
-
     /**
      * This method is called by addTotalsRow() to determine what CellStyle to use. By default we
      * just return totalsStyle which is either set to the default totals style, or can be overriden
@@ -468,40 +481,28 @@ public class ExcelExport extends TableExport {
         final Row sheetRow = sheetToAddTo.createRow(row);
         Property prop;
         Object propId;
-        String vaadinAlignment;
         Object value;
         Cell sheetCell;
         for (int col = 0; col < propIds.size(); col++) {
             propId = propIds.get(col);
-            if (table.getColumnGenerator(propId) != null) {
-                final ColumnGenerator tcg = table.getColumnGenerator(propId);
-                if (tcg instanceof ExportableColumnGenerator) {
-                    prop =
-                            ((ExportableColumnGenerator) tcg).getGeneratedProperty(rootItemId,
-                                    propId);
-                    value = prop.getValue();
-                } else {
-                    prop = null;
-                    value = null;
-                }
+            prop = getProperty(rootItemId, propId);
+            if (null == prop) {
+                value = null;
             } else {
-                prop = container.getContainerProperty(rootItemId, propId);
                 value = prop.getValue();
             }
             sheetCell = sheetRow.createCell(col);
             sheetCell.setCellStyle(getDataStyle(rootItemId, row, col));
-            vaadinAlignment = this.table.getColumnAlignment(propId);
-            if (Table.ALIGN_LEFT.equals(vaadinAlignment)) {
-                sheetCell.getCellStyle().setAlignment(CellStyle.ALIGN_LEFT);
-            } else if (Table.ALIGN_RIGHT.equals(vaadinAlignment)) {
-                sheetCell.getCellStyle().setAlignment(CellStyle.ALIGN_RIGHT);
-            } else {
-                sheetCell.getCellStyle().setAlignment(CellStyle.ALIGN_CENTER);
-            }
+            sheetCell.getCellStyle().setAlignment(
+                    vaadinAlignmentToCellAlignment(this.table.getColumnAlignment(propId)));
             if (null != value) {
                 if (!isNumeric(prop.getType())) {
-                    sheetCell.setCellValue(createHelper.createRichTextString(prop.getValue()
-                            .toString()));
+                    if (java.util.Date.class.isAssignableFrom(prop.getType())) {
+                        sheetCell.setCellValue((Date) prop.getValue());
+                    } else {
+                        sheetCell.setCellValue(createHelper.createRichTextString(prop.getValue()
+                                .toString()));
+                    }
                 } else {
                     try {
                         final Double d = Double.parseDouble(prop.getValue().toString());
@@ -513,6 +514,53 @@ public class ExcelExport extends TableExport {
                 }
             }
         }
+    }
+
+    private Property getProperty(final Object rootItemId, final Object propId) {
+        Property prop;
+        if (table.getColumnGenerator(propId) != null) {
+            final ColumnGenerator tcg = table.getColumnGenerator(propId);
+            if (tcg instanceof ExportableColumnGenerator) {
+                prop = ((ExportableColumnGenerator) tcg).getGeneratedProperty(rootItemId, propId);
+            } else {
+                prop = null;
+            }
+        } else {
+            prop = container.getContainerProperty(rootItemId, propId);
+        }
+        return prop;
+    }
+
+    private Class<?> getPropertyType(final Object propId) {
+        Class<?> classType;
+        if (table.getColumnGenerator(propId) != null) {
+            final ColumnGenerator tcg = table.getColumnGenerator(propId);
+            if (tcg instanceof ExportableColumnGenerator) {
+                classType = ((ExportableColumnGenerator) tcg).getType();
+            } else {
+                classType = String.class;
+            }
+        } else {
+            classType = container.getType(propId);
+        }
+        return classType;
+    }
+
+    private Short vaadinAlignmentToCellAlignment(final String vaadinAlignment) {
+        if (Table.ALIGN_LEFT.equals(vaadinAlignment)) {
+            return CellStyle.ALIGN_LEFT;
+        } else if (Table.ALIGN_RIGHT.equals(vaadinAlignment)) {
+            return CellStyle.ALIGN_RIGHT;
+        } else {
+            return CellStyle.ALIGN_CENTER;
+        }
+    }
+
+    public void setExcelFormatOfProperty(final Object propertyId, final String excelFormat) {
+        if (this.propertyExcelFormatMap.containsKey(propertyId)) {
+            this.propertyExcelFormatMap.remove(propertyId);
+        }
+        this.propertyExcelFormatMap.put(propertyId.toString(), excelFormat);
     }
 
     /**
@@ -539,6 +587,22 @@ public class ExcelExport extends TableExport {
             }
             return rowHeaderStyle;
         }
+        final Object propId = propIds.get(col);
+        if (this.propertyExcelFormatMap.containsKey(propId)) {
+            final CellStyle style = workbook.createCellStyle();
+            style.cloneStyleFrom(dataStyle);
+            style.setDataFormat(dataFormat.getFormat(propertyExcelFormatMap.get(propId)));
+            return style;
+        }
+        final Property prop = getProperty(rootItemId, propId);
+        if (null != prop) {
+            if (java.util.Date.class.isAssignableFrom(prop.getType())) {
+                final CellStyle style = workbook.createCellStyle();
+                style.cloneStyleFrom(dataStyle);
+                style.setDataFormat(dateDataFormat);
+                return style;
+            }
+        }
         return dataStyle;
     }
 
@@ -559,9 +623,13 @@ public class ExcelExport extends TableExport {
         Cell cell;
         CellRangeAddress cra;
         for (int col = 0; col < propIds.size(); col++) {
+            final Object propId = propIds.get(col);
             cell = totalsRow.createCell(col);
             cell.setCellStyle(getTotalsStyle(currentRow, startRow, col));
-            if (isNumeric(table.getType(propIds.get(col)))) {
+            cell.getCellStyle().setAlignment(
+                    vaadinAlignmentToCellAlignment(this.table.getColumnAlignment(propId)));
+            final Class<?> propType = getPropertyType(propId);
+            if (isNumeric(propType)) {
                 cra = new CellRangeAddress(startRow, currentRow - 1, col, col);
                 if (hierarchical) {
                     // 9 & 109 are for sum. 9 means include hidden cells, 109 means exclude.
@@ -707,6 +775,7 @@ public class ExcelExport extends TableExport {
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
         style.setBorderBottom(CellStyle.BORDER_THIN);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setDataFormat(doubleDataFormat);
         return style;
     }
 
@@ -726,8 +795,24 @@ public class ExcelExport extends TableExport {
         style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        style.setDataFormat(wb.createDataFormat().getFormat("0.00"));
+        style.setDataFormat(doubleDataFormat);
         return style;
+    }
+
+    protected short defaultDoubleDataFormat(final Workbook wb) {
+        return wb.createDataFormat().getFormat("0.00");
+    }
+
+    protected short defaultDateDataFormat(final Workbook wb) {
+        return wb.createDataFormat().getFormat("mm/dd/yyyy");
+    }
+
+    public void setDoubleDataFormat(final String excelDoubleFormat) {
+        doubleDataFormat = workbook.createDataFormat().getFormat(excelDoubleFormat);
+    }
+
+    public void setDateDataFormat(final String excelDateFormat) {
+        dateDataFormat = workbook.createDataFormat().getFormat(excelDateFormat);
     }
 
     /**

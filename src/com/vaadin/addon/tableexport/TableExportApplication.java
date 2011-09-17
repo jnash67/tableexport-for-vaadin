@@ -1,12 +1,21 @@
 package com.vaadin.addon.tableexport;
 
+import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.vaadin.Application;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -18,7 +27,9 @@ public class TableExportApplication extends Application {
 
     private static final long serialVersionUID = -5436901535719211794L;
 
-    private BeanItemContainer<TimeSheet> container;
+    private BeanItemContainer<PayCheck> container;
+    private SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
+    private DecimalFormat df = new DecimalFormat("#0.00");
 
     @Override
     public void init() {
@@ -26,25 +37,76 @@ public class TableExportApplication extends Application {
         setTheme("runo");
 
         // Create the table
-        container = new BeanItemContainer<TimeSheet>(TimeSheet.class);
-        // example taken from
-        // http://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/ss/examples/TimesheetDemo.java
-        final TimeSheet p1 =
-                new TimeSheet("Yegor Kozlov", "YK", 5.0, 8.0, 10.0, 5.0, 5.0, 7.0, 6.0);
-        final TimeSheet p2 =
-                new TimeSheet("Gisella Bronzetti", "GB", 4.0, 3.0, 1.0, 3.5, 2.0, 2.5, 4.0);
-        container.addBean(p1);
-        container.addBean(p2);
-        final Table table = new Table("Export Example");
+        container = new BeanItemContainer<PayCheck>(PayCheck.class);
+        try {
+            final PayCheck p1 =
+                    new PayCheck("John Smith", sdf.parse("09/17/2011"), 1000.0, true, "garbage1");
+            final PayCheck p2 =
+                    new PayCheck("John Smith", sdf.parse("09/24/2011"), 1000.0, true, "garbage2");
+            final PayCheck p3 =
+                    new PayCheck("Jane Doe", sdf.parse("08/31/2011"), 750.0, false, "garbage3");
+            final PayCheck p4 =
+                    new PayCheck("Jane Doe", sdf.parse("09/07/2011"), 750.0, false, "garbage4");
+            container.addBean(p1);
+            container.addBean(p2);
+            container.addBean(p3);
+            container.addBean(p4);
+        } catch (final ParseException pe) {
+        }
+
+        final Table table = new Table("Paycheck Export Example") {
+            private static final long serialVersionUID = -4182827794568302754L;
+
+            @Override
+            protected String formatPropertyValue(final Object rowId, final Object colId,
+                    final Property property) {
+                // Format by property type
+                if (property.getType() == Date.class) {
+                    return sdf.format((Date) property.getValue());
+                }
+                if (property.getType() == Double.class) {
+                    return df.format(property.getValue());
+                }
+                return super.formatPropertyValue(rowId, colId, property);
+            }
+        };
         table.setContainerDataSource(container);
-        // this also sets the order of the columns
-        table.setVisibleColumns(new String[]{"name", "ID", "mon", "tue", "wed", "thu", "fri",
-                "sat", "sun"});
-        table.setColumnHeaders(new String[]{"Name", "ID", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
-                "Sun"});
         table.setColumnCollapsingAllowed(true);
-        table.setColumnCollapsed("sat", true);
-        table.setColumnCollapsed("sun", true);
+        table.setColumnCollapsed("garbage", true);
+        table.addGeneratedColumn("taxes", new ExportableColumnGenerator() {
+            private static final long serialVersionUID = -1591034462395284596L;
+
+            @Override
+            public Component generateCell(final Table source, final Object itemId,
+                    final Object columnId) {
+                final Property prop = getGeneratedProperty(itemId, columnId);
+                Label label;
+                final Object v = prop.getValue();
+                if (v instanceof Double) {
+                    label = new Label(df.format(v));
+                } else {
+                    label = new Label(prop);
+                }
+                return label;
+            }
+            @Override
+            public Property getGeneratedProperty(final Object itemId, final Object columnId) {
+                final PayCheck p = (PayCheck) itemId;
+                final Double tax = .0825 * p.getAmount();
+                return new ObjectProperty<Double>(tax, Double.class);
+            }
+            @Override
+            public Class<?> getType() {
+                return Double.class;
+            }
+        });
+
+        // this also sets the order of the columns
+        table.setVisibleColumns(new String[]{"name", "date", "amount", "taxes", "manager",
+                "garbage"});
+        table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Taxes Paid",
+                "Is Manager?", "Collapsed Column Test"});
+        table.setColumnCollapsingAllowed(true);
 
         // create the layout with the export options
         final VerticalLayout options = new VerticalLayout();
@@ -55,15 +117,21 @@ public class TableExportApplication extends Application {
         final TextField reportTitleField = new TextField("Report Title", "Demo Report");
         final TextField sheetNameField = new TextField("Sheet Name", "Table Export");
         final TextField exportFileNameField = new TextField("Export Filename", "Table-Export.xls");
+        final TextField excelNumberFormat = new TextField("Excel Double Format", "#0.00");
+        final TextField excelDateFormat = new TextField("Excel Date Format", "mm/dd/yyyy");
         final CheckBox totalsRowField = new CheckBox("Add Totals Row", true);
         final CheckBox rowHeadersField = new CheckBox("Treat first Column as Row Headers", true);
+        final CheckBox excludeCollapsedColumns = new CheckBox("Exclude Collapsed Columns", true);
         options.addComponent(headerLabel);
         options.addComponent(verticalSpacer);
         options.addComponent(reportTitleField);
         options.addComponent(sheetNameField);
         options.addComponent(exportFileNameField);
+        options.addComponent(excelNumberFormat);
+        options.addComponent(excelDateFormat);
         options.addComponent(totalsRowField);
         options.addComponent(rowHeadersField);
+        options.addComponent(excludeCollapsedColumns);
 
         // create the export buttons
         final ThemeResource export = new ThemeResource("../images/table-excel.png");
@@ -84,7 +152,9 @@ public class TableExportApplication extends Application {
                 } else {
                     excelExport = new ExcelExport(table);
                 }
-                excelExport.excludeCollapsedColumns();
+                if ((Boolean) excludeCollapsedColumns.getValue()) {
+                    excelExport.excludeCollapsedColumns();
+                }
                 if (!"".equals(reportTitleField.getValue().toString())) {
                     excelExport.setReportTitle(reportTitleField.getValue().toString());
                 }
@@ -93,6 +163,8 @@ public class TableExportApplication extends Application {
                 }
                 excelExport.setDisplayTotals(((Boolean) totalsRowField.getValue()).booleanValue());
                 excelExport.setRowHeaders(((Boolean) rowHeadersField.getValue()).booleanValue());
+                excelExport.setExcelFormatOfProperty("date", excelDateFormat.getValue().toString());
+                excelExport.setDoubleDataFormat(excelNumberFormat.getValue().toString());
                 excelExport.export();
             }
         });
@@ -109,6 +181,9 @@ public class TableExportApplication extends Application {
                 } else {
                     excelExport = new EnhancedFormatExcelExport(table);
                 }
+                if ((Boolean) excludeCollapsedColumns.getValue()) {
+                    excelExport.excludeCollapsedColumns();
+                }
                 if (!"".equals(reportTitleField.getValue().toString())) {
                     excelExport.setReportTitle(reportTitleField.getValue().toString());
                 }
@@ -117,6 +192,8 @@ public class TableExportApplication extends Application {
                 }
                 excelExport.setDisplayTotals(((Boolean) totalsRowField.getValue()).booleanValue());
                 excelExport.setRowHeaders(((Boolean) rowHeadersField.getValue()).booleanValue());
+                excelExport.setExcelFormatOfProperty("date", excelDateFormat.getValue().toString());
+                excelExport.setDoubleDataFormat(excelNumberFormat.getValue().toString());
                 excelExport.export();
             }
         });
@@ -136,100 +213,64 @@ public class TableExportApplication extends Application {
         setMainWindow(mainWindow);
     }
 
-    public class TimeSheet {
-
+    public class PayCheck implements Serializable {
+        private static final long serialVersionUID = 9064899449347530333L;
         private String name;
+        private Date date;
+        private double amount;
+        private boolean manager;
+        private Object garbage;
 
-        private String ID;
-
-        private double mon, tue, wed, thu, fri, sat, sun;
-
-        public TimeSheet(final String name, final String iD, final double mon, final double tue,
-                final double wed, final double thu, final double fri, final double sat,
-                final double sun) {
+        public PayCheck(final String name, final Date date, final double amount,
+                final boolean manager, final Object garbageToIgnore) {
             super();
             this.name = name;
-            this.ID = iD;
-            this.mon = mon;
-            this.tue = tue;
-            this.wed = wed;
-            this.thu = thu;
-            this.fri = fri;
-            this.sat = sat;
-            this.sun = sun;
+            this.date = date;
+            this.amount = amount;
+            this.manager = manager;
+            this.garbage = garbageToIgnore;
         }
 
         public String getName() {
             return this.name;
         }
 
-        public String getID() {
-            return this.ID;
+        public Date getDate() {
+            return this.date;
         }
 
-        public double getMon() {
-            return this.mon;
+        public double getAmount() {
+            return this.amount;
         }
 
-        public double getTue() {
-            return this.tue;
-        }
-
-        public double getWed() {
-            return this.wed;
-        }
-
-        public double getThu() {
-            return this.thu;
-        }
-
-        public double getFri() {
-            return this.fri;
-        }
-
-        public double getSat() {
-            return this.sat;
-        }
-
-        public double getSun() {
-            return this.sun;
+        public boolean isManager() {
+            return this.manager;
         }
 
         public void setName(final String name) {
             this.name = name;
         }
 
-        public void setID(final String iD) {
-            this.ID = iD;
+        public void setDate(final Date date) {
+            this.date = date;
         }
 
-        public void setMon(final double mon) {
-            this.mon = mon;
+        public void setAmount(final double amount) {
+            this.amount = amount;
         }
 
-        public void setTue(final double tue) {
-            this.tue = tue;
+        public void setManager(final boolean manager) {
+            this.manager = manager;
         }
 
-        public void setWed(final double wed) {
-            this.wed = wed;
+        public Object getGarbage() {
+            return this.garbage;
         }
 
-        public void setThu(final double thu) {
-            this.thu = thu;
+        public void setGarbage(final Object garbage) {
+            this.garbage = garbage;
         }
 
-        public void setFri(final double fri) {
-            this.fri = fri;
-        }
-
-        public void setSat(final double sat) {
-            this.sat = sat;
-        }
-
-        public void setSun(final double sun) {
-            this.sun = sun;
-        }
     }
 
 }
