@@ -106,6 +106,8 @@ public class TableExportApplication extends Application {
                 "garbage"});
         table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Taxes Paid",
                 "Is Manager?", "Collapsed Column Test"});
+        table.setColumnAlignments(new String[]{Table.ALIGN_LEFT, Table.ALIGN_CENTER,
+                Table.ALIGN_RIGHT, Table.ALIGN_CENTER, Table.ALIGN_LEFT, Table.ALIGN_LEFT});
         table.setColumnCollapsingAllowed(true);
 
         // create the layout with the export options
