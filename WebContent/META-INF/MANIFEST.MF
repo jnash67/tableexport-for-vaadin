@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Implementation-Title: TableExport
-Implementation-Version: 1.2.3
+Implementation-Version: 1.2.4
 Vaadin-Package-Version: 1
-Class-Path: 
 Vaadin-Widgetsets: com.vaadin.addon.tableexport.widgetset.Tableexport_
  for_vaadinWidgetset
+Class-Path: 
 

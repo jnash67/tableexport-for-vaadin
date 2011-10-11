@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gwt-2.4.0"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Vaadin-6.6.6"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-3.8-beta3-20110606.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-io-2.1.jar" sourcepath="doc/commons-io-2.1-sources.jar">
 		<attributes>
-			<attribute name="owner.project.facets" value="java"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/tableexport-for-vaadin/doc/commons-io-2.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/vaadin-6.6.7.jar" sourcepath="C:/dropbox/lib/vaadin/vaadin-6.6.7/WebContent/vaadin-6.6.7.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/dropbox/lib/vaadin/vaadin-6.6.7/WebContent/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/poi-3.8-beta3-20110606.jar" sourcepath="doc/apache-poi-3.8-beta3-20110606-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/tableexport-for-vaadin/doc/apache-poi-3.8-beta3-20110606-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gwt-dev.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gwt-user.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/validation-api-1.0.0.GA-sources.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/validation-api-1.0.0.GA.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

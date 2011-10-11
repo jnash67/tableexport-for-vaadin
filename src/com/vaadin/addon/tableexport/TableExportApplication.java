@@ -6,8 +6,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.FilenameUtils;
+
 import com.vaadin.Application;
 import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.terminal.ThemeResource;
@@ -28,8 +32,8 @@ public class TableExportApplication extends Application {
     private static final long serialVersionUID = -5436901535719211794L;
 
     private BeanItemContainer<PayCheck> container;
-    private SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
-    private DecimalFormat df = new DecimalFormat("#0.00");
+    private SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yy");
+    private DecimalFormat df = new DecimalFormat("#0.0000");
 
     @Override
     public void init() {
@@ -54,20 +58,22 @@ public class TableExportApplication extends Application {
         } catch (final ParseException pe) {
         }
 
-        final Table table = new Table("Paycheck Export Example") {
+        final Table table = new PropertyFormatTable() {
             private static final long serialVersionUID = -4182827794568302754L;
 
             @Override
             protected String formatPropertyValue(final Object rowId, final Object colId,
                     final Property property) {
                 // Format by property type
+                String s;
                 if (property.getType() == Date.class) {
-                    return sdf.format((Date) property.getValue());
+                    s = sdf.format((Date) property.getValue());
+                } else if (property.getType() == Double.class) {
+                    s = df.format(property.getValue());
+                } else {
+                    s = super.formatPropertyValue(rowId, colId, property);
                 }
-                if (property.getType() == Double.class) {
-                    return df.format(property.getValue());
-                }
-                return super.formatPropertyValue(rowId, colId, property);
+                return s;
             }
         };
         table.setContainerDataSource(container);
@@ -124,6 +130,24 @@ public class TableExportApplication extends Application {
         final CheckBox totalsRowField = new CheckBox("Add Totals Row", true);
         final CheckBox rowHeadersField = new CheckBox("Treat first Column as Row Headers", true);
         final CheckBox excludeCollapsedColumns = new CheckBox("Exclude Collapsed Columns", true);
+        final CheckBox useTableFormatProperty = new CheckBox("Use Table Format Property", false);
+        final CheckBox exportAsCsv = new CheckBox("Export As CSV", false);
+        exportAsCsv.setImmediate(true);
+        exportAsCsv.addListener(new ValueChangeListener() {
+            private static final long serialVersionUID = -2031199434445240881L;
+
+            @Override
+            public void valueChange(final ValueChangeEvent event) {
+                final String fn = exportFileNameField.getValue().toString();
+                final String justName = FilenameUtils.getBaseName(fn);
+                if ((Boolean) exportAsCsv.getValue()) {
+                    exportFileNameField.setValue(justName + ".csv");
+                } else {
+                    exportFileNameField.setValue(justName + ".xls");
+                }
+                exportFileNameField.requestRepaint();
+            }
+        });
         options.addComponent(headerLabel);
         options.addComponent(verticalSpacer);
         options.addComponent(reportTitleField);
@@ -134,6 +158,8 @@ public class TableExportApplication extends Application {
         options.addComponent(totalsRowField);
         options.addComponent(rowHeadersField);
         options.addComponent(excludeCollapsedColumns);
+        options.addComponent(useTableFormatProperty);
+        options.addComponent(exportAsCsv);
 
         // create the export buttons
         final ThemeResource export = new ThemeResource("../images/table-excel.png");
@@ -143,6 +169,9 @@ public class TableExportApplication extends Application {
         final Button overriddenExportButton = new Button("Enhanced Export");
         overriddenExportButton.setIcon(export);
 
+        final Button fontExampleExportButton = new Button("Andreas Test");
+        fontExampleExportButton.setIcon(export);
+
         regularExportButton.addListener(new ClickListener() {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
@@ -150,12 +179,23 @@ public class TableExportApplication extends Application {
             @Override
             public void buttonClick(final ClickEvent event) {
                 if (!"".equals(sheetNameField.getValue().toString())) {
-                    excelExport = new ExcelExport(table, sheetNameField.getValue().toString());
+                    if ((Boolean) exportAsCsv.getValue()) {
+                        excelExport = new CsvExport(table, sheetNameField.getValue().toString());
+                    } else {
+                        excelExport = new ExcelExport(table, sheetNameField.getValue().toString());
+                    }
                 } else {
-                    excelExport = new ExcelExport(table);
+                    if ((Boolean) exportAsCsv.getValue()) {
+                        excelExport = new CsvExport(table);
+                    } else {
+                        excelExport = new ExcelExport(table);
+                    }
                 }
                 if ((Boolean) excludeCollapsedColumns.getValue()) {
                     excelExport.excludeCollapsedColumns();
+                }
+                if ((Boolean) useTableFormatProperty.getValue()) {
+                    excelExport.setUseTableFormatPropertyValue(true);
                 }
                 if (!"".equals(reportTitleField.getValue().toString())) {
                     excelExport.setReportTitle(reportTitleField.getValue().toString());
@@ -177,12 +217,47 @@ public class TableExportApplication extends Application {
             @Override
             public void buttonClick(final ClickEvent event) {
                 if (!"".equals(sheetNameField.getValue().toString())) {
-                    excelExport =
-                            new EnhancedFormatExcelExport(table, sheetNameField.getValue()
-                                    .toString());
+                    if ((Boolean) exportAsCsv.getValue()) {
+                        excelExport = new CsvExport(table, sheetNameField.getValue().toString());
+                    } else {
+                        excelExport =
+                                new EnhancedFormatExcelExport(table, sheetNameField.getValue()
+                                        .toString());
+                    }
                 } else {
-                    excelExport = new EnhancedFormatExcelExport(table);
+                    if ((Boolean) exportAsCsv.getValue()) {
+                        excelExport = new CsvExport(table);
+                    } else {
+                        excelExport = new EnhancedFormatExcelExport(table);
+                    }
                 }
+                if ((Boolean) excludeCollapsedColumns.getValue()) {
+                    excelExport.excludeCollapsedColumns();
+                }
+                if ((Boolean) useTableFormatProperty.getValue()) {
+                    excelExport.setUseTableFormatPropertyValue(true);
+                }
+                if (!"".equals(reportTitleField.getValue().toString())) {
+                    excelExport.setReportTitle(reportTitleField.getValue().toString());
+                }
+                if (!"".equals(exportFileNameField.getValue().toString())) {
+                    excelExport.setExportFileName(exportFileNameField.getValue().toString());
+                }
+                excelExport.setDisplayTotals(((Boolean) totalsRowField.getValue()).booleanValue());
+                excelExport.setRowHeaders(((Boolean) rowHeadersField.getValue()).booleanValue());
+                excelExport.setExcelFormatOfProperty("date", excelDateFormat.getValue().toString());
+                excelExport.setDoubleDataFormat(excelNumberFormat.getValue().toString());
+                excelExport.export();
+            }
+        });
+        fontExampleExportButton.addListener(new ClickListener() {
+            private static final long serialVersionUID = -73954695086117200L;
+            private ExcelExport excelExport;
+
+            @Override
+            public void buttonClick(final ClickEvent event) {
+                excelExport =
+                        new FontExampleExcelExport(table, sheetNameField.getValue().toString());
                 if ((Boolean) excludeCollapsedColumns.getValue()) {
                     excelExport.excludeCollapsedColumns();
                 }
@@ -201,6 +276,7 @@ public class TableExportApplication extends Application {
         });
         options.addComponent(regularExportButton);
         options.addComponent(overriddenExportButton);
+        options.addComponent(fontExampleExportButton);
 
         // add to window
         final HorizontalLayout tableAndOptions = new HorizontalLayout();

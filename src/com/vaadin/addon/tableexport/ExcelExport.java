@@ -31,6 +31,7 @@ import org.apache.poi.ss.util.RegionUtil;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 
@@ -75,6 +76,12 @@ public class ExcelExport extends TableExport {
      * formatted either like the column headers or a special row headers CellStyle can be specified.
      */
     protected boolean rowHeaders = false;
+
+    /**
+     * Flag indicating whether we should use table.formatPropertyValue() as the cell value instead
+     * of the property value using the specified data formats.
+     */
+    protected boolean useTableFormatPropertyValue = false;
 
     /** The Property ids of the Items in the Table. */
     protected final LinkedList<Object> propIds;
@@ -271,6 +278,7 @@ public class ExcelExport extends TableExport {
             }
             return super.sendConvertedFileToUser(table.getApplication(), tempFile, exportFileName);
         } catch (final IOException e) {
+            LOGGER.warning("Converting to XLS failed with IOException " + e);
             return false;
         }
     }
@@ -522,6 +530,7 @@ public class ExcelExport extends TableExport {
             }
         }
     }
+
     private Property getProperty(final Object rootItemId, final Object propId) {
         Property prop;
         if (table.getColumnGenerator(propId) != null) {
@@ -533,6 +542,18 @@ public class ExcelExport extends TableExport {
             }
         } else {
             prop = container.getContainerProperty(rootItemId, propId);
+            if (useTableFormatPropertyValue) {
+                if (table instanceof ExportableFormattedProperty) {
+                    final String formattedProp =
+                            ((ExportableFormattedProperty) table).getFormattedPropertyValue(
+                                    rootItemId, propId, prop);
+                    if (!prop.getValue().toString().equals(formattedProp)) {
+                        prop = new ObjectProperty<String>(formattedProp, String.class);
+                    }
+                } else {
+                    LOGGER.warning("Cannot use Table formatted property unless Table is instance of ExportableFormattedProperty");
+                }
+            }
         }
         return prop;
     }
@@ -1016,6 +1037,10 @@ public class ExcelExport extends TableExport {
      */
     public void setDisplayTotals(final boolean displayTotals) {
         this.displayTotals = displayTotals;
+    }
+
+    public void setUseTableFormatPropertyValue(final boolean useFormatPropertyValue) {
+        this.useTableFormatPropertyValue = useFormatPropertyValue;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.vaadin.addon.tableexport;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 import com.vaadin.Application;
 import com.vaadin.ui.Table;
@@ -10,7 +11,10 @@ import com.vaadin.ui.Table;
 public abstract class TableExport implements Serializable {
 
     private static final long serialVersionUID = -2972527330991334117L;
+    private static final Logger LOGGER = Logger.getLogger(TableExport.class.getName());
+
     public static String EXCEL_MIME_TYPE = "application/vnd.ms-excel";
+    public static String CSV_MIME_TYPE = "text/cvs";
 
     /** The Table to export. */
     protected final Table table;
@@ -62,6 +66,7 @@ public abstract class TableExport implements Serializable {
                     new TemporaryFileDownloadResource(app, exportFileName, mimeType, fileToExport);
             app.getMainWindow().open(resource, exportWindow);
         } catch (final FileNotFoundException e) {
+            LOGGER.warning("Sending file to user failed with FileNotFoundException " + e);
             return false;
         }
         return true;
