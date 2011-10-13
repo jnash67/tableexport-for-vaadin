@@ -559,6 +559,8 @@ public class ExcelExport extends TableExport {
                                     rootItemId, propId, prop);
                     if (null == prop) {
                         prop = new ObjectProperty<String>(formattedProp, String.class);
+                    } else if (null == prop.getValue()) {
+                        prop = new ObjectProperty<String>(formattedProp, String.class);
                     } else if (!prop.getValue().toString().equals(formattedProp)) {
                         prop = new ObjectProperty<String>(formattedProp, String.class);
                     }
