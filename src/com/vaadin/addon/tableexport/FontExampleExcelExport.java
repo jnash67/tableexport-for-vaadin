@@ -74,7 +74,7 @@ public class FontExampleExcelExport extends ExcelExport {
         style.setTopBorderColor(HSSFColor.BLACK.index);
         style.setBottomBorderColor(HSSFColor.BLACK.index);
 
-        style = this.getDataStyle();
+        style = this.getDoubleDataStyle();
         style.setFillForegroundColor(HSSFColor.WHITE.index);
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         f = workbook.getFontAt(style.getFontIndex());

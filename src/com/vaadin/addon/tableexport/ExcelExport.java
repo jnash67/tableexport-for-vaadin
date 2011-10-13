@@ -101,8 +101,9 @@ public class ExcelExport extends TableExport {
      * Various styles that are used in report generation. These can be set by the user if the
      * default style is not desired to be used.
      */
-    protected CellStyle dataStyle, totalsStyle, columnHeaderStyle, titleStyle;
+    protected CellStyle dateDataStyle, doubleDataStyle, totalsStyle, columnHeaderStyle, titleStyle;
     protected Short dateDataFormat, doubleDataFormat;
+    protected Map<Short, CellStyle> dataFormatDataStylesMap = new HashMap<Short, CellStyle>();
 
     /**
      * The default row header style is null and, if row headers are specified with
@@ -206,7 +207,15 @@ public class ExcelExport extends TableExport {
         dataFormat = workbook.createDataFormat();
         dateDataFormat = defaultDateDataFormat(workbook);
         doubleDataFormat = defaultDoubleDataFormat(workbook);
-        dataStyle = defaultDataStyle(workbook);
+
+        doubleDataStyle = defaultDataStyle(workbook);
+        doubleDataStyle.setDataFormat(doubleDataFormat);
+        dataFormatDataStylesMap.put(doubleDataFormat, doubleDataStyle);
+
+        dateDataStyle = defaultDataStyle(workbook);
+        dateDataStyle.setDataFormat(dateDataFormat);
+        dataFormatDataStylesMap.put(dateDataFormat, dateDataStyle);
+
         totalsStyle = defaultTotalsStyle(workbook);
         columnHeaderStyle = defaultHeaderStyle(workbook);
         titleStyle = defaultTitleStyle(workbook);
@@ -505,7 +514,8 @@ public class ExcelExport extends TableExport {
                 value = prop.getValue();
             }
             sheetCell = sheetRow.createCell(col);
-            sheetCell.setCellStyle(getCellStyle(rootItemId, row, col, false));
+            final CellStyle cs = getCellStyle(rootItemId, row, col, false);
+            sheetCell.setCellStyle(cs);
             final String vaadinAlignment = this.table.getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(sheetCell, workbook, poiAlignment);
@@ -547,7 +557,9 @@ public class ExcelExport extends TableExport {
                     final String formattedProp =
                             ((ExportableFormattedProperty) table).getFormattedPropertyValue(
                                     rootItemId, propId, prop);
-                    if (!prop.getValue().toString().equals(formattedProp)) {
+                    if (null == prop) {
+                        prop = new ObjectProperty<String>(formattedProp, String.class);
+                    } else if (!prop.getValue().toString().equals(formattedProp)) {
                         prop = new ObjectProperty<String>(formattedProp, String.class);
                     }
                 } else {
@@ -609,37 +621,36 @@ public class ExcelExport extends TableExport {
      */
     protected CellStyle getCellStyle(final Object rootItemId, final int row, final int col,
             final boolean totalsRow) {
-        final CellStyle retStyle = workbook.createCellStyle();
         final Object propId = propIds.get(col);
         // get the basic style for the type of cell (i.e. data, header, total)
         if ((rowHeaders) && (col == 0)) {
             if (null == rowHeaderStyle) {
-                retStyle.cloneStyleFrom(columnHeaderStyle);
-            } else {
-                retStyle.cloneStyleFrom(rowHeaderStyle);
+                return columnHeaderStyle;
             }
-        } else {
-            if (totalsRow) {
-                retStyle.cloneStyleFrom(totalsStyle);
-            } else {
-                retStyle.cloneStyleFrom(dataStyle);
-            }
+            return rowHeaderStyle;
+        }
+        if (totalsRow) {
+            return totalsStyle;
         }
         // set the dataformat, regardless of the other style settings
-        if (!((rowHeaders) && (col == 0) && (row == 0))) {
-            if (this.propertyExcelFormatMap.containsKey(propId)) {
-                retStyle.setDataFormat(dataFormat.getFormat(propertyExcelFormatMap.get(propId)));
-            } else {
-                final Class<?> propType = getPropertyType(propId);
-                if (isNumeric(propType)) {
-                    retStyle.setDataFormat(doubleDataFormat);
-                } else if (java.util.Date.class.isAssignableFrom(propType)) {
-                    retStyle.setDataFormat(dateDataFormat);
-                }
-
+        if (this.propertyExcelFormatMap.containsKey(propId)) {
+            final short df = dataFormat.getFormat(propertyExcelFormatMap.get(propId));
+            if (dataFormatDataStylesMap.containsKey(df)) {
+                return dataFormatDataStylesMap.get(df);
             }
+            final CellStyle retStyle = workbook.createCellStyle();
+            retStyle.cloneStyleFrom(dataFormatDataStylesMap.get(doubleDataFormat));
+            retStyle.setDataFormat(df);
+            dataFormatDataStylesMap.put(df, retStyle);
+            return retStyle;
         }
-        return retStyle;
+        final Class<?> propType = getPropertyType(propId);
+        if (isNumeric(propType)) {
+            return dataFormatDataStylesMap.get(doubleDataFormat);
+        } else if (java.util.Date.class.isAssignableFrom(propType)) {
+            return dataFormatDataStylesMap.get(dateDataFormat);
+        }
+        return dataFormatDataStylesMap.get(doubleDataFormat);
     }
 
     /**
@@ -817,11 +828,31 @@ public class ExcelExport extends TableExport {
     }
 
     public void setDoubleDataFormat(final String excelDoubleFormat) {
+        CellStyle prevDoubleDataStyle = null;
+        if (dataFormatDataStylesMap.containsKey(doubleDataFormat)) {
+            prevDoubleDataStyle = dataFormatDataStylesMap.get(doubleDataFormat);
+            dataFormatDataStylesMap.remove(doubleDataFormat);
+        }
         doubleDataFormat = createHelper.createDataFormat().getFormat(excelDoubleFormat);
+        if (null != prevDoubleDataStyle) {
+            doubleDataStyle = prevDoubleDataStyle;
+            doubleDataStyle.setDataFormat(doubleDataFormat);
+            dataFormatDataStylesMap.put(doubleDataFormat, doubleDataStyle);
+        }
     }
 
     public void setDateDataFormat(final String excelDateFormat) {
+        CellStyle prevDateDataStyle = null;
+        if (dataFormatDataStylesMap.containsKey(dateDataFormat)) {
+            prevDateDataStyle = dataFormatDataStylesMap.get(dateDataFormat);
+            dataFormatDataStylesMap.remove(dateDataFormat);
+        }
         dateDataFormat = createHelper.createDataFormat().getFormat(excelDateFormat);
+        if (null != prevDateDataStyle) {
+            dateDataStyle = prevDateDataStyle;
+            dateDataStyle.setDataFormat(dateDataFormat);
+            dataFormatDataStylesMap.put(dateDataFormat, dateDataStyle);
+        }
     }
 
     /**
@@ -893,8 +924,12 @@ public class ExcelExport extends TableExport {
      * 
      * @return the cell style
      */
-    public CellStyle getDataStyle() {
-        return this.dataStyle;
+    public CellStyle getDoubleDataStyle() {
+        return this.doubleDataStyle;
+    }
+
+    public CellStyle getDateDataStyle() {
+        return this.dateDataStyle;
     }
 
     /**
@@ -943,8 +978,11 @@ public class ExcelExport extends TableExport {
      * @param dataStyle
      *            the new data style
      */
-    public void setDataStyle(final CellStyle dataStyle) {
-        this.dataStyle = dataStyle;
+    public void setDoubleDataStyle(final CellStyle doubleDataStyle) {
+        this.doubleDataStyle = doubleDataStyle;
+    }
+    public void setDateDataStyle(final CellStyle dateDataStyle) {
+        this.dateDataStyle = dateDataStyle;
     }
 
     /**

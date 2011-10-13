@@ -63,7 +63,7 @@ public class EnhancedFormatExcelExport extends ExcelExport {
         style.setTopBorderColor(HSSFColor.BLACK.index);
         style.setBottomBorderColor(HSSFColor.BLACK.index);
 
-        style = this.getDataStyle();
+        style = this.getDoubleDataStyle();
         style.setFillForegroundColor(HSSFColor.LIGHT_CORNFLOWER_BLUE.index);
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         f = workbook.getFontAt(style.getFontIndex());
