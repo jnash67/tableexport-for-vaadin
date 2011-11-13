@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.logging.Logger;
 
 import com.vaadin.Application;
+import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Table;
 
 public abstract class TableExport implements Serializable {
@@ -17,7 +18,12 @@ public abstract class TableExport implements Serializable {
     public static String CSV_MIME_TYPE = "text/cvs";
 
     /** The Table to export. */
-    protected final Table table;
+    private Table table;
+
+    /**
+     * Whether the Container is a HierarchicalContainer or an extension thereof.
+     */
+    private boolean hierarchical;
 
     /** The window to send the export result */
     protected String exportWindow = "_self";
@@ -25,7 +31,29 @@ public abstract class TableExport implements Serializable {
     protected String mimeType;
 
     public TableExport(final Table table) {
+        this.setTable(table);
+    }
+
+    public Table getTable() {
+        return table;
+    }
+
+    public void setTable(final Table table) {
         this.table = table;
+        if (HierarchicalContainer.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
+            setHierarchical(true);
+
+        } else {
+            setHierarchical(false);
+        }
+    }
+
+    public boolean isHierarchical() {
+        return hierarchical;
+    }
+
+    private void setHierarchical(final boolean hierarchical) {
+        this.hierarchical = hierarchical;
     }
 
     public abstract void convertTable();

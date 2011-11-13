@@ -169,6 +169,12 @@ public class TableExportApplication extends Application {
         final Button overriddenExportButton = new Button("Enhanced Export");
         overriddenExportButton.setIcon(export);
 
+        final Button twoTabsExportButton = new Button("Two Tab Test");
+        twoTabsExportButton.setIcon(export);
+
+        final Button SXSSFWorkbookExportButton = new Button("Export Using SXSSFWorkbook");
+        SXSSFWorkbookExportButton.setIcon(export);
+
         final Button fontExampleExportButton = new Button("Andreas Test");
         fontExampleExportButton.setIcon(export);
 
@@ -250,6 +256,31 @@ public class TableExportApplication extends Application {
                 excelExport.export();
             }
         });
+        twoTabsExportButton.addListener(new ClickListener() {
+            private static final long serialVersionUID = -6704383486117436516L;
+            private ExcelExport excelExport;
+
+            @Override
+            public void buttonClick(final ClickEvent event) {
+                excelExport =
+                        new ExcelExport(table, sheetNameField.getValue().toString(),
+                                reportTitleField.getValue().toString(), exportFileNameField
+                                        .getValue().toString(), ((Boolean) totalsRowField
+                                        .getValue()).booleanValue());
+                if ((Boolean) excludeCollapsedColumns.getValue()) {
+                    excelExport.excludeCollapsedColumns();
+                }
+                if ((Boolean) useTableFormatProperty.getValue()) {
+                    excelExport.setUseTableFormatPropertyValue(true);
+                }
+                excelExport.setRowHeaders(((Boolean) rowHeadersField.getValue()).booleanValue());
+                excelExport.setExcelFormatOfProperty("date", excelDateFormat.getValue().toString());
+                excelExport.setDoubleDataFormat(excelNumberFormat.getValue().toString());
+                excelExport.convertTable();
+                excelExport.setNextTable(table, "Second Sheet");
+                excelExport.export();
+            }
+        });
         fontExampleExportButton.addListener(new ClickListener() {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
@@ -276,6 +307,8 @@ public class TableExportApplication extends Application {
         });
         options.addComponent(regularExportButton);
         options.addComponent(overriddenExportButton);
+        options.addComponent(twoTabsExportButton);
+
         options.addComponent(fontExampleExportButton);
 
         // add to window

@@ -28,7 +28,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
 
-import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -47,9 +46,6 @@ public class ExcelExport extends TableExport {
     private static final long serialVersionUID = -8404407996727936497L;
     private static final Logger LOGGER = Logger.getLogger(ExcelExport.class.getName());
 
-    /** The Container of the Table obtained through getContainerDataSource(). */
-    protected final Container container;
-
     /** The name of the sheet in the workbook the table contents will be written to. */
     protected String sheetName;
 
@@ -58,12 +54,6 @@ public class ExcelExport extends TableExport {
 
     /** The filename of the workbook that will be sent to the user. */
     protected String exportFileName;
-
-    /**
-     * Internal determination of whether the Container is a HierarchicalContainer or an extension
-     * thereof.
-     */
-    protected final boolean hierarchical;
 
     /**
      * Flag indicating whether we will add a totals row to the Table. A totals row in the Table is
@@ -87,10 +77,10 @@ public class ExcelExport extends TableExport {
     protected final LinkedList<Object> propIds;
 
     /** The workbook that contains the sheet containing the report with the table contents. */
-    protected final HSSFWorkbook workbook;
+    protected final Workbook workbook;
 
     /** The Sheet object that will contain the table contents report. */
-    protected final Sheet sheet;
+    protected Sheet sheet;
     protected Sheet hierarchicalTotalsSheet = null;
 
     /** The POI cell creation helper. */
@@ -124,7 +114,7 @@ public class ExcelExport extends TableExport {
      *            the table
      */
     public ExcelExport(final Table table) {
-        this(table, "Table Export");
+        this(table, null);
     }
 
     /**
@@ -150,7 +140,7 @@ public class ExcelExport extends TableExport {
      *            the report title
      */
     public ExcelExport(final Table table, final String sheetName, final String reportTitle) {
-        this(table, sheetName, reportTitle, "Table-Export.xls");
+        this(table, sheetName, reportTitle, null);
     }
 
     /**
@@ -188,20 +178,30 @@ public class ExcelExport extends TableExport {
      */
     public ExcelExport(final Table table, final String sheetName, final String reportTitle,
             final String exportFileName, final boolean hasTotalsRow) {
-        super(table);
-        this.sheetName = sheetName;
-        this.reportTitle = reportTitle;
-        this.exportFileName = exportFileName;
-        this.displayTotals = hasTotalsRow;
-        container = table.getContainerDataSource();
-        if (HierarchicalContainer.class.isAssignableFrom(container.getClass())) {
-            hierarchical = true;
+        this(table, new HSSFWorkbook(), sheetName, reportTitle, exportFileName, true);
+    }
 
+    public ExcelExport(final Table table, final Workbook wkbk, final String sheetName,
+            final String reportTitle, final String exportFileName, final boolean hasTotalsRow) {
+        super(table);
+        if ((null == sheetName) || ("".equals(sheetName))) {
+            this.sheetName = "Table Export";
         } else {
-            hierarchical = false;
+            this.sheetName = sheetName;
         }
+        if (null == reportTitle) {
+            this.reportTitle = "";
+        } else {
+            this.reportTitle = reportTitle;
+        }
+        if ((null == exportFileName) || ("".equals(exportFileName))) {
+            this.exportFileName = "Table-Export.xls";
+        } else {
+            this.exportFileName = exportFileName;
+        }
+        this.displayTotals = hasTotalsRow;
         propIds = new LinkedList<Object>(Arrays.asList(table.getVisibleColumns()));
-        workbook = new HSSFWorkbook();
+        workbook = wkbk;
         sheet = workbook.createSheet(sheetName);
         createHelper = workbook.getCreationHelper();
         dataFormat = workbook.createDataFormat();
@@ -222,6 +222,14 @@ public class ExcelExport extends TableExport {
     }
 
     /*
+     * Set a new table to be exported in another workbook tab / sheet.
+     */
+    public void setNextTable(final Table table, final String sheetName) {
+        setTable(table);
+        sheet = workbook.createSheet(sheetName);
+    }
+
+    /*
      * This will exclude columns from the export that are not visible due to them being collapsed.
      * This should be called before convertTable() is called.
      */
@@ -229,7 +237,7 @@ public class ExcelExport extends TableExport {
         final Iterator<Object> iterator = propIds.iterator();
         while (iterator.hasNext()) {
             final Object propId = iterator.next();
-            if (table.isColumnCollapsed(propId)) {
+            if (getTable().isColumnCollapsed(propId)) {
                 iterator.remove();
             }
         }
@@ -253,7 +261,7 @@ public class ExcelExport extends TableExport {
         row++;
 
         // add data rows
-        if (hierarchical) {
+        if (isHierarchical()) {
             row = addHierarchicalDataRows(sheet, row);
         } else {
             row = addDataRows(sheet, row);
@@ -285,7 +293,8 @@ public class ExcelExport extends TableExport {
             if (null == mimeType) {
                 setMimeType(EXCEL_MIME_TYPE);
             }
-            return super.sendConvertedFileToUser(table.getApplication(), tempFile, exportFileName);
+            return super.sendConvertedFileToUser(getTable().getApplication(), tempFile,
+                    exportFileName);
         } catch (final IOException e) {
             LOGGER.warning("Converting to XLS failed with IOException " + e);
             return false;
@@ -301,7 +310,7 @@ public class ExcelExport extends TableExport {
         printSetup.setLandscape(true);
         sheet.setFitToPage(true);
         sheet.setHorizontallyCenter(true);
-        if ((hierarchical) && (displayTotals)) {
+        if ((isHierarchical()) && (displayTotals)) {
             hierarchicalTotalsSheet = workbook.createSheet("tempHts");
         }
     }
@@ -366,11 +375,11 @@ public class ExcelExport extends TableExport {
         for (int col = 0; col < propIds.size(); col++) {
             propId = propIds.get(col);
             headerCell = headerRow.createCell(col);
-            headerCell.setCellValue(createHelper.createRichTextString(table.getColumnHeader(propId)
-                    .toString()));
+            headerCell.setCellValue(createHelper.createRichTextString(getTable().getColumnHeader(
+                    propId).toString()));
             headerCell.setCellStyle(getColumnHeaderStyle(row, col));
 
-            final String vaadinAlignment = this.table.getColumnAlignment(propId);
+            final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(headerCell, workbook, poiAlignment);
         }
@@ -414,7 +423,7 @@ public class ExcelExport extends TableExport {
     protected int addHierarchicalDataRows(final Sheet sheetToAddTo, final int row) {
         final Collection<?> roots;
         int localRow = row;
-        roots = ((HierarchicalContainer) container).rootItemIds();
+        roots = ((HierarchicalContainer) getTable().getContainerDataSource()).rootItemIds();
         /*
          * For HierarchicalContainers, the outlining/grouping in the sheet is with the summary row
          * at the top and the grouped/outlined subcategories below.
@@ -448,7 +457,7 @@ public class ExcelExport extends TableExport {
      * @return the int
      */
     protected int addDataRows(final Sheet sheetToAddTo, final int row) {
-        final Collection<?> itemIds = container.getItemIds();
+        final Collection<?> itemIds = getTable().getContainerDataSource().getItemIds();
         int localRow = row;
         int count = 0;
         for (final Object itemId : itemIds) {
@@ -479,9 +488,10 @@ public class ExcelExport extends TableExport {
         int localRow = row;
         addDataRow(sheetToAddTo, rootItemId, row);
         numberAdded++;
-        if (((HierarchicalContainer) container).hasChildren(rootItemId)) {
+        if (((HierarchicalContainer) getTable().getContainerDataSource()).hasChildren(rootItemId)) {
             final Collection<?> children =
-                    ((HierarchicalContainer) container).getChildren(rootItemId);
+                    ((HierarchicalContainer) getTable().getContainerDataSource())
+                            .getChildren(rootItemId);
             for (final Object child : children) {
                 localRow++;
                 numberAdded = numberAdded + addDataRowRecursively(sheetToAddTo, child, localRow);
@@ -516,25 +526,23 @@ public class ExcelExport extends TableExport {
             sheetCell = sheetRow.createCell(col);
             final CellStyle cs = getCellStyle(rootItemId, row, col, false);
             sheetCell.setCellStyle(cs);
-            final String vaadinAlignment = this.table.getColumnAlignment(propId);
+            final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(sheetCell, workbook, poiAlignment);
             if (null != value) {
                 if (!isNumeric(prop.getType())) {
                     if (java.util.Date.class.isAssignableFrom(prop.getType())) {
-                        sheetCell.setCellValue((Date) prop.getValue());
+                        sheetCell.setCellValue((Date) value);
                     } else {
-                        sheetCell.setCellValue(createHelper.createRichTextString(prop.getValue()
-                                .toString()));
+                        sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
                     }
                 } else {
                     try {
-                        final Double d = Double.parseDouble(prop.getValue().toString());
+                        final Double d = Double.parseDouble(value.toString());
                         sheetCell.setCellValue(d);
                     } catch (final NumberFormatException nfe) {
                         LOGGER.warning("NumberFormatException parsing a numeric value: " + nfe);
-                        sheetCell.setCellValue(createHelper.createRichTextString(prop.getValue()
-                                .toString()));
+                        sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
                     }
                 }
             }
@@ -543,26 +551,29 @@ public class ExcelExport extends TableExport {
 
     private Property getProperty(final Object rootItemId, final Object propId) {
         Property prop;
-        if (table.getColumnGenerator(propId) != null) {
-            final ColumnGenerator tcg = table.getColumnGenerator(propId);
+        if (getTable().getColumnGenerator(propId) != null) {
+            final ColumnGenerator tcg = getTable().getColumnGenerator(propId);
             if (tcg instanceof ExportableColumnGenerator) {
                 prop = ((ExportableColumnGenerator) tcg).getGeneratedProperty(rootItemId, propId);
             } else {
                 prop = null;
             }
         } else {
-            prop = container.getContainerProperty(rootItemId, propId);
+            prop = getTable().getContainerDataSource().getContainerProperty(rootItemId, propId);
             if (useTableFormatPropertyValue) {
-                if (table instanceof ExportableFormattedProperty) {
+                if (getTable() instanceof ExportableFormattedProperty) {
                     final String formattedProp =
-                            ((ExportableFormattedProperty) table).getFormattedPropertyValue(
+                            ((ExportableFormattedProperty) getTable()).getFormattedPropertyValue(
                                     rootItemId, propId, prop);
                     if (null == prop) {
                         prop = new ObjectProperty<String>(formattedProp, String.class);
-                    } else if (null == prop.getValue()) {
-                        prop = new ObjectProperty<String>(formattedProp, String.class);
-                    } else if (!prop.getValue().toString().equals(formattedProp)) {
-                        prop = new ObjectProperty<String>(formattedProp, String.class);
+                    } else {
+                        final Object val = prop.getValue();
+                        if (null == val) {
+                            prop = new ObjectProperty<String>(formattedProp, String.class);
+                        } else if (!val.toString().equals(formattedProp)) {
+                            prop = new ObjectProperty<String>(formattedProp, String.class);
+                        }
                     }
                 } else {
                     LOGGER.warning("Cannot use Table formatted property unless Table is instance of ExportableFormattedProperty");
@@ -574,15 +585,15 @@ public class ExcelExport extends TableExport {
 
     private Class<?> getPropertyType(final Object propId) {
         Class<?> classType;
-        if (table.getColumnGenerator(propId) != null) {
-            final ColumnGenerator tcg = table.getColumnGenerator(propId);
+        if (getTable().getColumnGenerator(propId) != null) {
+            final ColumnGenerator tcg = getTable().getColumnGenerator(propId);
             if (tcg instanceof ExportableColumnGenerator) {
                 classType = ((ExportableColumnGenerator) tcg).getType();
             } else {
                 classType = String.class;
             }
         } else {
-            classType = container.getType(propId);
+            classType = getTable().getContainerDataSource().getType(propId);
         }
         return classType;
     }
@@ -675,13 +686,13 @@ public class ExcelExport extends TableExport {
             final Object propId = propIds.get(col);
             cell = totalsRow.createCell(col);
             cell.setCellStyle(getCellStyle(currentRow, startRow, col, true));
-            final String vaadinAlignment = this.table.getColumnAlignment(propId);
+            final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(cell, workbook, poiAlignment);
             final Class<?> propType = getPropertyType(propId);
             if (isNumeric(propType)) {
                 cra = new CellRangeAddress(startRow, currentRow - 1, col, col);
-                if (hierarchical) {
+                if (isHierarchical()) {
                     // 9 & 109 are for sum. 9 means include hidden cells, 109 means exclude.
                     // this will show the wrong value if the user expands an outlined category, so
                     // we will range value it first
@@ -706,7 +717,7 @@ public class ExcelExport extends TableExport {
      */
     protected void finalSheetFormat() {
         final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-        if (hierarchical) {
+        if (isHierarchical()) {
             /*
              * evaluateInCell() is equivalent to paste special -> value. The formula refers to cells
              * in the other sheet we are going to delete. We sum in the other sheet because if we
@@ -886,7 +897,7 @@ public class ExcelExport extends TableExport {
      * 
      * @return the workbook
      */
-    public HSSFWorkbook getWorkbook() {
+    public Workbook getWorkbook() {
         return this.workbook;
     }
 
