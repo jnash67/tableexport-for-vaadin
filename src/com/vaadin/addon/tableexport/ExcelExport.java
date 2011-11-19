@@ -3,12 +3,11 @@ package com.vaadin.addon.tableexport;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -72,9 +71,6 @@ public class ExcelExport extends TableExport {
      * of the property value using the specified data formats.
      */
     protected boolean useTableFormatPropertyValue = false;
-
-    /** The Property ids of the Items in the Table. */
-    protected final LinkedList<Object> propIds;
 
     /** The workbook that contains the sheet containing the report with the table contents. */
     protected final Workbook workbook;
@@ -200,7 +196,6 @@ public class ExcelExport extends TableExport {
             this.exportFileName = exportFileName;
         }
         this.displayTotals = hasTotalsRow;
-        propIds = new LinkedList<Object>(Arrays.asList(table.getVisibleColumns()));
         workbook = wkbk;
         sheet = workbook.createSheet(sheetName);
         createHelper = workbook.getCreationHelper();
@@ -234,7 +229,7 @@ public class ExcelExport extends TableExport {
      * This should be called before convertTable() is called.
      */
     public void excludeCollapsedColumns() {
-        final Iterator<Object> iterator = propIds.iterator();
+        final Iterator<Object> iterator = getPropIds().iterator();
         while (iterator.hasNext()) {
             final Object propId = iterator.next();
             if (getTable().isColumnCollapsed(propId)) {
@@ -331,12 +326,12 @@ public class ExcelExport extends TableExport {
             final CellRangeAddress cra;
             if (rowHeaders) {
                 titleCell = titleRow.createCell(1);
-                cra = new CellRangeAddress(0, 0, 1, propIds.size() - 1);
+                cra = new CellRangeAddress(0, 0, 1, getPropIds().size() - 1);
                 sheet.addMergedRegion(cra);
             } else {
                 titleCell = titleRow.createCell(0);
-                cra = new CellRangeAddress(0, 0, 0, propIds.size() - 1);
-                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, propIds.size() - 1));
+                cra = new CellRangeAddress(0, 0, 0, getPropIds().size() - 1);
+                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, getPropIds().size() - 1));
             }
             titleCell.setCellValue(reportTitle);
             titleCell.setCellStyle(titleStyle);
@@ -372,8 +367,8 @@ public class ExcelExport extends TableExport {
         Cell headerCell;
         Object propId;
         headerRow.setHeightInPoints(40);
-        for (int col = 0; col < propIds.size(); col++) {
-            propId = propIds.get(col);
+        for (int col = 0; col < getPropIds().size(); col++) {
+            propId = getPropIds().get(col);
             headerCell = headerRow.createCell(col);
             headerCell.setCellValue(createHelper.createRichTextString(getTable().getColumnHeader(
                     propId).toString()));
@@ -515,8 +510,8 @@ public class ExcelExport extends TableExport {
         Object propId;
         Object value;
         Cell sheetCell;
-        for (int col = 0; col < propIds.size(); col++) {
-            propId = propIds.get(col);
+        for (int col = 0; col < getPropIds().size(); col++) {
+            propId = getPropIds().get(col);
             prop = getProperty(rootItemId, propId);
             if (null == prop) {
                 value = null;
@@ -634,7 +629,7 @@ public class ExcelExport extends TableExport {
      */
     protected CellStyle getCellStyle(final Object rootItemId, final int row, final int col,
             final boolean totalsRow) {
-        final Object propId = propIds.get(col);
+        final Object propId = getPropIds().get(col);
         // get the basic style for the type of cell (i.e. data, header, total)
         if ((rowHeaders) && (col == 0)) {
             if (null == rowHeaderStyle) {
@@ -682,8 +677,8 @@ public class ExcelExport extends TableExport {
         totalsRow.setHeightInPoints(30);
         Cell cell;
         CellRangeAddress cra;
-        for (int col = 0; col < propIds.size(); col++) {
-            final Object propId = propIds.get(col);
+        for (int col = 0; col < getPropIds().size(); col++) {
+            final Object propId = getPropIds().get(col);
             cell = totalsRow.createCell(col);
             cell.setCellStyle(getCellStyle(currentRow, startRow, col, true));
             final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
@@ -736,7 +731,7 @@ public class ExcelExport extends TableExport {
         } else {
             evaluator.evaluateAll();
         }
-        for (int col = 0; col < propIds.size(); col++) {
+        for (int col = 0; col < getPropIds().size(); col++) {
             sheet.autoSizeColumn(col);
         }
     }
@@ -886,6 +881,8 @@ public class ExcelExport extends TableExport {
         } else if ((Short.class.equals(type)) || (short.class.equals(type))) {
             return true;
         } else if ((Float.class.equals(type)) || (float.class.equals(type))) {
+            return true;
+        } else if ((BigDecimal.class.equals(type)) || (BigDecimal.class.equals(type))) {
             return true;
         }
         return false;

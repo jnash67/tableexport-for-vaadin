@@ -3,6 +3,9 @@ package com.vaadin.addon.tableexport;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.vaadin.Application;
@@ -19,6 +22,8 @@ public abstract class TableExport implements Serializable {
 
     /** The Table to export. */
     private Table table;
+    /** The Property ids of the Items in the Table. */
+    private LinkedList<Object> propIds;
 
     /**
      * Whether the Container is a HierarchicalContainer or an extension thereof.
@@ -38,8 +43,13 @@ public abstract class TableExport implements Serializable {
         return table;
     }
 
+    public List<Object> getPropIds() {
+        return propIds;
+    }
+
     public void setTable(final Table table) {
         this.table = table;
+        this.propIds = new LinkedList<Object>(Arrays.asList(table.getVisibleColumns()));
         if (HierarchicalContainer.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
             setHierarchical(true);
 
