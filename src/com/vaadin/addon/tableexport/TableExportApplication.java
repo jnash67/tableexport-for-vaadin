@@ -175,8 +175,11 @@ public class TableExportApplication extends Application {
         final Button SXSSFWorkbookExportButton = new Button("Export Using SXSSFWorkbook");
         SXSSFWorkbookExportButton.setIcon(export);
 
-        final Button fontExampleExportButton = new Button("Andreas Test");
+        final Button fontExampleExportButton = new Button("Andreas Font Test");
         fontExampleExportButton.setIcon(export);
+
+        final Button noHeaderTestButton = new Button("Andreas No Header Test");
+        noHeaderTestButton.setIcon(export);
 
         regularExportButton.addListener(new ClickListener() {
             private static final long serialVersionUID = -73954695086117200L;
@@ -305,11 +308,27 @@ public class TableExportApplication extends Application {
                 excelExport.export();
             }
         });
+        noHeaderTestButton.addListener(new ClickListener() {
+            private static final long serialVersionUID = 9139558937906815722L;
+            private ExcelExport excelExport;
+
+            @Override
+            public void buttonClick(final ClickEvent event) {
+                final SimpleDateFormat expFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+                excelExport = new ExcelExport(table, "Tätigkeiten");
+                excelExport.excludeCollapsedColumns();
+                excelExport.setDisplayTotals(true);
+                excelExport.setRowHeaders(false);
+                excelExport.setExportFileName("Tätigkeiten-" + expFormat.format(new Date())
+                        + ".xls");
+                excelExport.export();
+            }
+        });
         options.addComponent(regularExportButton);
         options.addComponent(overriddenExportButton);
         options.addComponent(twoTabsExportButton);
-
         options.addComponent(fontExampleExportButton);
+        options.addComponent(noHeaderTestButton);
 
         // add to window
         final HorizontalLayout tableAndOptions = new HorizontalLayout();

@@ -315,43 +315,42 @@ public class ExcelExport extends TableExport {
      * Alternately, the title Row Object is accessible via getTitleRow() after report creation. To
      * change title text use setReportTitle(). To change title CellStyle use setTitleStyle().
      * 
-     * 
      * @return the int
      */
     protected int addTitleRow() {
-        if (null != reportTitle) {
-            titleRow = sheet.createRow(0);
-            titleRow.setHeightInPoints(45);
-            final Cell titleCell;
-            final CellRangeAddress cra;
-            if (rowHeaders) {
-                titleCell = titleRow.createCell(1);
-                cra = new CellRangeAddress(0, 0, 1, getPropIds().size() - 1);
-                sheet.addMergedRegion(cra);
-            } else {
-                titleCell = titleRow.createCell(0);
-                cra = new CellRangeAddress(0, 0, 0, getPropIds().size() - 1);
-                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, getPropIds().size() - 1));
-            }
-            titleCell.setCellValue(reportTitle);
-            titleCell.setCellStyle(titleStyle);
-            // cell borders don't work on merged ranges so, if there are borders
-            // we apply them to the merged range here.
-            if (titleStyle.getBorderLeft() != CellStyle.BORDER_NONE) {
-                RegionUtil.setBorderLeft(titleStyle.getBorderLeft(), cra, sheet, workbook);
-            }
-            if (titleStyle.getBorderRight() != CellStyle.BORDER_NONE) {
-                RegionUtil.setBorderRight(titleStyle.getBorderRight(), cra, sheet, workbook);
-            }
-            if (titleStyle.getBorderTop() != CellStyle.BORDER_NONE) {
-                RegionUtil.setBorderTop(titleStyle.getBorderTop(), cra, sheet, workbook);
-            }
-            if (titleStyle.getBorderBottom() != CellStyle.BORDER_NONE) {
-                RegionUtil.setBorderBottom(titleStyle.getBorderBottom(), cra, sheet, workbook);
-            }
-            return 1;
+        if ((null == reportTitle) || ("".equals(reportTitle))) {
+            return 0;
         }
-        return 0;
+        titleRow = sheet.createRow(0);
+        titleRow.setHeightInPoints(45);
+        final Cell titleCell;
+        final CellRangeAddress cra;
+        if (rowHeaders) {
+            titleCell = titleRow.createCell(1);
+            cra = new CellRangeAddress(0, 0, 1, getPropIds().size() - 1);
+            sheet.addMergedRegion(cra);
+        } else {
+            titleCell = titleRow.createCell(0);
+            cra = new CellRangeAddress(0, 0, 0, getPropIds().size() - 1);
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, getPropIds().size() - 1));
+        }
+        titleCell.setCellValue(reportTitle);
+        titleCell.setCellStyle(titleStyle);
+        // cell borders don't work on merged ranges so, if there are borders
+        // we apply them to the merged range here.
+        if (titleStyle.getBorderLeft() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderLeft(titleStyle.getBorderLeft(), cra, sheet, workbook);
+        }
+        if (titleStyle.getBorderRight() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderRight(titleStyle.getBorderRight(), cra, sheet, workbook);
+        }
+        if (titleStyle.getBorderTop() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderTop(titleStyle.getBorderTop(), cra, sheet, workbook);
+        }
+        if (titleStyle.getBorderBottom() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderBottom(titleStyle.getBorderBottom(), cra, sheet, workbook);
+        }
+        return 1;
     }
 
     /**
@@ -379,6 +378,7 @@ public class ExcelExport extends TableExport {
             CellUtil.setAlignment(headerCell, workbook, poiAlignment);
         }
     }
+
     /**
      * This method is called by addTotalsRow() to determine what CellStyle to use. By default we
      * just return totalsStyle which is either set to the default totals style, or can be overriden
