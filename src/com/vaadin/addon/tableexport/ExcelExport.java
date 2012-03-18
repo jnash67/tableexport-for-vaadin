@@ -27,8 +27,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -87,16 +87,17 @@ public class ExcelExport extends TableExport {
      * Various styles that are used in report generation. These can be set by the user if the
      * default style is not desired to be used.
      */
-    protected CellStyle dateDataStyle, doubleDataStyle, totalsStyle, columnHeaderStyle, titleStyle;
+    protected CellStyle dateCellStyle, doubleCellStyle, totalsCellStyle, columnHeaderCellStyle,
+            titleCellStyle;
     protected Short dateDataFormat, doubleDataFormat;
-    protected Map<Short, CellStyle> dataFormatDataStylesMap = new HashMap<Short, CellStyle>();
+    protected Map<Short, CellStyle> dataFormatCellStylesMap = new HashMap<Short, CellStyle>();
 
     /**
      * The default row header style is null and, if row headers are specified with
      * setRowHeaders(true), then the column headers style is used. setRowHeaderStyle() allows the
      * user to specify a different row header style.
      */
-    protected CellStyle rowHeaderStyle = null;
+    protected CellStyle rowHeaderCellStyle = null;
 
     /** The totals row. */
     protected Row titleRow, headerRow, totalsRow;
@@ -174,46 +175,46 @@ public class ExcelExport extends TableExport {
      */
     public ExcelExport(final Table table, final String sheetName, final String reportTitle,
             final String exportFileName, final boolean hasTotalsRow) {
-        this(table, new HSSFWorkbook(), sheetName, reportTitle, exportFileName, true);
+        this(table, new HSSFWorkbook(), sheetName, reportTitle, exportFileName, hasTotalsRow);
     }
 
-    public ExcelExport(final Table table, final Workbook wkbk, final String sheetName,
-            final String reportTitle, final String exportFileName, final boolean hasTotalsRow) {
+    public ExcelExport(final Table table, final Workbook wkbk, final String shtName,
+            final String rptTitle, final String xptFileName, final boolean hasTotalsRow) {
         super(table);
-        if ((null == sheetName) || ("".equals(sheetName))) {
+        if ((null == shtName) || ("".equals(shtName))) {
             this.sheetName = "Table Export";
         } else {
-            this.sheetName = sheetName;
+            this.sheetName = shtName;
         }
-        if (null == reportTitle) {
+        if (null == rptTitle) {
             this.reportTitle = "";
         } else {
-            this.reportTitle = reportTitle;
+            this.reportTitle = rptTitle;
         }
-        if ((null == exportFileName) || ("".equals(exportFileName))) {
+        if ((null == xptFileName) || ("".equals(xptFileName))) {
             this.exportFileName = "Table-Export.xls";
         } else {
-            this.exportFileName = exportFileName;
+            this.exportFileName = xptFileName;
         }
         this.displayTotals = hasTotalsRow;
-        workbook = wkbk;
-        sheet = workbook.createSheet(sheetName);
-        createHelper = workbook.getCreationHelper();
-        dataFormat = workbook.createDataFormat();
-        dateDataFormat = defaultDateDataFormat(workbook);
-        doubleDataFormat = defaultDoubleDataFormat(workbook);
+        this.workbook = wkbk;
+        this.sheet = this.workbook.createSheet(this.sheetName);
+        this.createHelper = this.workbook.getCreationHelper();
+        this.dataFormat = this.workbook.createDataFormat();
+        this.dateDataFormat = defaultDateDataFormat(this.workbook);
+        this.doubleDataFormat = defaultDoubleDataFormat(this.workbook);
 
-        doubleDataStyle = defaultDataStyle(workbook);
-        doubleDataStyle.setDataFormat(doubleDataFormat);
-        dataFormatDataStylesMap.put(doubleDataFormat, doubleDataStyle);
+        this.doubleCellStyle = defaultDataCellStyle(this.workbook);
+        this.doubleCellStyle.setDataFormat(doubleDataFormat);
+        this.dataFormatCellStylesMap.put(doubleDataFormat, doubleCellStyle);
 
-        dateDataStyle = defaultDataStyle(workbook);
-        dateDataStyle.setDataFormat(dateDataFormat);
-        dataFormatDataStylesMap.put(dateDataFormat, dateDataStyle);
+        this.dateCellStyle = defaultDataCellStyle(this.workbook);
+        this.dateCellStyle.setDataFormat(this.dateDataFormat);
+        this.dataFormatCellStylesMap.put(this.dateDataFormat, this.dateCellStyle);
 
-        totalsStyle = defaultTotalsStyle(workbook);
-        columnHeaderStyle = defaultHeaderStyle(workbook);
-        titleStyle = defaultTitleStyle(workbook);
+        this.totalsCellStyle = defaultTotalsCellStyle(this.workbook);
+        this.columnHeaderCellStyle = defaultHeaderCellStyle(this.workbook);
+        this.titleCellStyle = defaultTitleCellStyle(this.workbook);
     }
 
     /*
@@ -280,19 +281,28 @@ public class ExcelExport extends TableExport {
      */
     @Override
     public boolean sendConverted() {
-        File tempFile;
+        File tempFile = null;
+        FileOutputStream fileOut = null;
         try {
             tempFile = File.createTempFile("tmp", ".xls");
-            final FileOutputStream fileOut = new FileOutputStream(tempFile);
+            fileOut = new FileOutputStream(tempFile);
             workbook.write(fileOut);
             if (null == mimeType) {
                 setMimeType(EXCEL_MIME_TYPE);
             }
-            return super.sendConvertedFileToUser(getTable().getApplication(), tempFile,
-                    exportFileName);
+            final boolean success =
+                    super.sendConvertedFileToUser(getTable().getApplication(), tempFile,
+                            exportFileName);
+            return success;
         } catch (final IOException e) {
             LOGGER.warning("Converting to XLS failed with IOException " + e);
             return false;
+        } finally {
+            tempFile.deleteOnExit();
+            try {
+                fileOut.close();
+            } catch (final IOException e) {
+            }
         }
     }
 
@@ -335,20 +345,20 @@ public class ExcelExport extends TableExport {
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, getPropIds().size() - 1));
         }
         titleCell.setCellValue(reportTitle);
-        titleCell.setCellStyle(titleStyle);
+        titleCell.setCellStyle(titleCellStyle);
         // cell borders don't work on merged ranges so, if there are borders
         // we apply them to the merged range here.
-        if (titleStyle.getBorderLeft() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderLeft(titleStyle.getBorderLeft(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderLeft() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderLeft(titleCellStyle.getBorderLeft(), cra, sheet, workbook);
         }
-        if (titleStyle.getBorderRight() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderRight(titleStyle.getBorderRight(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderRight() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderRight(titleCellStyle.getBorderRight(), cra, sheet, workbook);
         }
-        if (titleStyle.getBorderTop() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderTop(titleStyle.getBorderTop(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderTop() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderTop(titleCellStyle.getBorderTop(), cra, sheet, workbook);
         }
-        if (titleStyle.getBorderBottom() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderBottom(titleStyle.getBorderBottom(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderBottom() != CellStyle.BORDER_NONE) {
+            RegionUtil.setBorderBottom(titleCellStyle.getBorderBottom(), cra, sheet, workbook);
         }
         return 1;
     }
@@ -381,11 +391,11 @@ public class ExcelExport extends TableExport {
 
     /**
      * This method is called by addTotalsRow() to determine what CellStyle to use. By default we
-     * just return totalsStyle which is either set to the default totals style, or can be overriden
-     * by the user using setTotalsStyle(). However, if the user wants to have different total items
-     * have different styles, then this method should be overriden. The parameters passed in are all
-     * potentially relevant items that may be used to determine what formatting to return, that are
-     * not accessible globally.
+     * just return totalsCellStyle which is either set to the default totals style, or can be
+     * overriden by the user using setTotalsStyle(). However, if the user wants to have different
+     * total items have different styles, then this method should be overriden. The parameters
+     * passed in are all potentially relevant items that may be used to determine what formatting to
+     * return, that are not accessible globally.
      * 
      * @param row
      *            the row
@@ -398,13 +408,13 @@ public class ExcelExport extends TableExport {
      */
     protected CellStyle getColumnHeaderStyle(final int row, final int col) {
         if ((rowHeaders) && (col == 0)) {
-            return titleStyle;
+            return titleCellStyle;
         }
-        return columnHeaderStyle;
+        return columnHeaderCellStyle;
     }
 
     /**
-     * For HierarchicalContainers, this method recursively adds root items and child items. The
+     * For Hierarchical Containers, this method recursively adds root items and child items. The
      * child items are appropriately grouped using grouping/outlining sheet functionality. Override
      * this method to make any changes. To change the CellStyle used for all Table data use
      * setDataStyle(). For different data cells to have different CellStyles, override
@@ -418,9 +428,9 @@ public class ExcelExport extends TableExport {
     protected int addHierarchicalDataRows(final Sheet sheetToAddTo, final int row) {
         final Collection<?> roots;
         int localRow = row;
-        roots = ((HierarchicalContainer) getTable().getContainerDataSource()).rootItemIds();
+        roots = ((Container.Hierarchical) getTable().getContainerDataSource()).rootItemIds();
         /*
-         * For HierarchicalContainers, the outlining/grouping in the sheet is with the summary row
+         * For Hierarchical Containers, the outlining/grouping in the sheet is with the summary row
          * at the top and the grouped/outlined subcategories below.
          */
         sheet.setRowSumsBelow(false);
@@ -442,7 +452,7 @@ public class ExcelExport extends TableExport {
     }
 
     /**
-     * this method adds row items for non-HierarchicalContainers. Override this method to make any
+     * this method adds row items for non-Hierarchical Containers. Override this method to make any
      * changes. To change the CellStyle used for all Table data use setDataStyle(). For different
      * data cells to have different CellStyles, override getDataStyle().
      * 
@@ -483,9 +493,9 @@ public class ExcelExport extends TableExport {
         int localRow = row;
         addDataRow(sheetToAddTo, rootItemId, row);
         numberAdded++;
-        if (((HierarchicalContainer) getTable().getContainerDataSource()).hasChildren(rootItemId)) {
+        if (((Container.Hierarchical) getTable().getContainerDataSource()).hasChildren(rootItemId)) {
             final Collection<?> children =
-                    ((HierarchicalContainer) getTable().getContainerDataSource())
+                    ((Container.Hierarchical) getTable().getContainerDataSource())
                             .getChildren(rootItemId);
             for (final Object child : children) {
                 localRow++;
@@ -632,33 +642,33 @@ public class ExcelExport extends TableExport {
         final Object propId = getPropIds().get(col);
         // get the basic style for the type of cell (i.e. data, header, total)
         if ((rowHeaders) && (col == 0)) {
-            if (null == rowHeaderStyle) {
-                return columnHeaderStyle;
+            if (null == rowHeaderCellStyle) {
+                return columnHeaderCellStyle;
             }
-            return rowHeaderStyle;
+            return rowHeaderCellStyle;
         }
         if (totalsRow) {
-            return totalsStyle;
+            return totalsCellStyle;
         }
         // set the dataformat, regardless of the other style settings
         if (this.propertyExcelFormatMap.containsKey(propId)) {
             final short df = dataFormat.getFormat(propertyExcelFormatMap.get(propId));
-            if (dataFormatDataStylesMap.containsKey(df)) {
-                return dataFormatDataStylesMap.get(df);
+            if (dataFormatCellStylesMap.containsKey(df)) {
+                return dataFormatCellStylesMap.get(df);
             }
             final CellStyle retStyle = workbook.createCellStyle();
-            retStyle.cloneStyleFrom(dataFormatDataStylesMap.get(doubleDataFormat));
+            retStyle.cloneStyleFrom(dataFormatCellStylesMap.get(doubleDataFormat));
             retStyle.setDataFormat(df);
-            dataFormatDataStylesMap.put(df, retStyle);
+            dataFormatCellStylesMap.put(df, retStyle);
             return retStyle;
         }
         final Class<?> propType = getPropertyType(propId);
         if (isNumeric(propType)) {
-            return dataFormatDataStylesMap.get(doubleDataFormat);
+            return dataFormatCellStylesMap.get(doubleDataFormat);
         } else if (java.util.Date.class.isAssignableFrom(propType)) {
-            return dataFormatDataStylesMap.get(dateDataFormat);
+            return dataFormatCellStylesMap.get(dateDataFormat);
         }
-        return dataFormatDataStylesMap.get(doubleDataFormat);
+        return dataFormatCellStylesMap.get(doubleDataFormat);
     }
 
     /**
@@ -727,7 +737,9 @@ public class ExcelExport extends TableExport {
                 }
             }
             workbook.setActiveSheet(workbook.getSheetIndex(sheet));
-            workbook.removeSheetAt(workbook.getSheetIndex(hierarchicalTotalsSheet));
+            if (hierarchicalTotalsSheet != null) {
+                workbook.removeSheetAt(workbook.getSheetIndex(hierarchicalTotalsSheet));
+            }
         } else {
             evaluator.evaluateAll();
         }
@@ -745,7 +757,7 @@ public class ExcelExport extends TableExport {
      * 
      * @return the cell style
      */
-    protected CellStyle defaultTitleStyle(final Workbook wb) {
+    protected CellStyle defaultTitleCellStyle(final Workbook wb) {
         CellStyle style;
         final Font titleFont = wb.createFont();
         titleFont.setFontHeightInPoints((short) 18);
@@ -766,7 +778,7 @@ public class ExcelExport extends TableExport {
      * 
      * @return the cell style
      */
-    protected CellStyle defaultHeaderStyle(final Workbook wb) {
+    protected CellStyle defaultHeaderCellStyle(final Workbook wb) {
         CellStyle style;
         final Font monthFont = wb.createFont();
         monthFont.setFontHeightInPoints((short) 11);
@@ -790,7 +802,7 @@ public class ExcelExport extends TableExport {
      * 
      * @return the cell style
      */
-    protected CellStyle defaultDataStyle(final Workbook wb) {
+    protected CellStyle defaultDataCellStyle(final Workbook wb) {
         CellStyle style;
         style = wb.createCellStyle();
         style.setAlignment(CellStyle.ALIGN_CENTER);
@@ -816,7 +828,7 @@ public class ExcelExport extends TableExport {
      * 
      * @return the cell style
      */
-    protected CellStyle defaultTotalsStyle(final Workbook wb) {
+    protected CellStyle defaultTotalsCellStyle(final Workbook wb) {
         CellStyle style;
         style = wb.createCellStyle();
         style.setAlignment(CellStyle.ALIGN_CENTER);
@@ -837,29 +849,29 @@ public class ExcelExport extends TableExport {
 
     public void setDoubleDataFormat(final String excelDoubleFormat) {
         CellStyle prevDoubleDataStyle = null;
-        if (dataFormatDataStylesMap.containsKey(doubleDataFormat)) {
-            prevDoubleDataStyle = dataFormatDataStylesMap.get(doubleDataFormat);
-            dataFormatDataStylesMap.remove(doubleDataFormat);
+        if (dataFormatCellStylesMap.containsKey(doubleDataFormat)) {
+            prevDoubleDataStyle = dataFormatCellStylesMap.get(doubleDataFormat);
+            dataFormatCellStylesMap.remove(doubleDataFormat);
         }
         doubleDataFormat = createHelper.createDataFormat().getFormat(excelDoubleFormat);
         if (null != prevDoubleDataStyle) {
-            doubleDataStyle = prevDoubleDataStyle;
-            doubleDataStyle.setDataFormat(doubleDataFormat);
-            dataFormatDataStylesMap.put(doubleDataFormat, doubleDataStyle);
+            doubleCellStyle = prevDoubleDataStyle;
+            doubleCellStyle.setDataFormat(doubleDataFormat);
+            dataFormatCellStylesMap.put(doubleDataFormat, doubleCellStyle);
         }
     }
 
     public void setDateDataFormat(final String excelDateFormat) {
         CellStyle prevDateDataStyle = null;
-        if (dataFormatDataStylesMap.containsKey(dateDataFormat)) {
-            prevDateDataStyle = dataFormatDataStylesMap.get(dateDataFormat);
-            dataFormatDataStylesMap.remove(dateDataFormat);
+        if (dataFormatCellStylesMap.containsKey(dateDataFormat)) {
+            prevDateDataStyle = dataFormatCellStylesMap.get(dateDataFormat);
+            dataFormatCellStylesMap.remove(dateDataFormat);
         }
         dateDataFormat = createHelper.createDataFormat().getFormat(excelDateFormat);
         if (null != prevDateDataStyle) {
-            dateDataStyle = prevDateDataStyle;
-            dateDataStyle.setDataFormat(dateDataFormat);
-            dataFormatDataStylesMap.put(dateDataFormat, dateDataStyle);
+            dateCellStyle = prevDateDataStyle;
+            dateCellStyle.setDataFormat(dateDataFormat);
+            dataFormatCellStylesMap.put(dateDataFormat, dateCellStyle);
         }
     }
 
@@ -935,11 +947,11 @@ public class ExcelExport extends TableExport {
      * @return the cell style
      */
     public CellStyle getDoubleDataStyle() {
-        return this.doubleDataStyle;
+        return this.doubleCellStyle;
     }
 
     public CellStyle getDateDataStyle() {
-        return this.dateDataStyle;
+        return this.dateCellStyle;
     }
 
     /**
@@ -949,7 +961,7 @@ public class ExcelExport extends TableExport {
      * @return the column header style
      */
     public CellStyle getColumnHeaderStyle() {
-        return this.columnHeaderStyle;
+        return this.columnHeaderCellStyle;
     }
 
     /**
@@ -959,7 +971,7 @@ public class ExcelExport extends TableExport {
      * @return the title style
      */
     public CellStyle getTitleStyle() {
-        return this.titleStyle;
+        return this.titleCellStyle;
     }
 
     /**
@@ -989,31 +1001,31 @@ public class ExcelExport extends TableExport {
      *            the new data style
      */
     public void setDoubleDataStyle(final CellStyle doubleDataStyle) {
-        this.doubleDataStyle = doubleDataStyle;
+        this.doubleCellStyle = doubleDataStyle;
     }
     public void setDateDataStyle(final CellStyle dateDataStyle) {
-        this.dateDataStyle = dateDataStyle;
+        this.dateCellStyle = dateDataStyle;
     }
 
     /**
      * Sets the cell style used for the report headers.
      * 
      * 
-     * @param columnHeaderStyle
+     * @param columnHeaderCellStyle
      *            CellStyle
      */
     public void setColumnHeaderStyle(final CellStyle columnHeaderStyle) {
-        this.columnHeaderStyle = columnHeaderStyle;
+        this.columnHeaderCellStyle = columnHeaderStyle;
     }
 
     /**
      * Sets the cell style used for the report title.
      * 
-     * @param titleStyle
+     * @param titleCellStyle
      *            the new title style
      */
     public void setTitleStyle(final CellStyle titleStyle) {
-        this.titleStyle = titleStyle;
+        this.titleCellStyle = titleStyle;
     }
 
     /**
@@ -1053,17 +1065,17 @@ public class ExcelExport extends TableExport {
      * @return the totals style
      */
     public CellStyle getTotalsStyle() {
-        return this.totalsStyle;
+        return this.totalsCellStyle;
     }
 
     /**
      * Sets the cell style used for the totals row.
      * 
-     * @param totalsStyle
+     * @param totalsCellStyle
      *            the new totals style
      */
     public void setTotalsStyle(final CellStyle totalsStyle) {
-        this.totalsStyle = totalsStyle;
+        this.totalsCellStyle = totalsStyle;
     }
 
     /**
@@ -1106,7 +1118,7 @@ public class ExcelExport extends TableExport {
      * @return CellStyle
      */
     public CellStyle getRowHeaderStyle() {
-        return this.rowHeaderStyle;
+        return this.rowHeaderCellStyle;
     }
 
     /**
@@ -1122,11 +1134,11 @@ public class ExcelExport extends TableExport {
     /**
      * Method setRowHeaderStyle.
      * 
-     * @param rowHeaderStyle
+     * @param rowHeaderCellStyle
      *            CellStyle
      */
     public void setRowHeaderStyle(final CellStyle rowHeaderStyle) {
-        this.rowHeaderStyle = rowHeaderStyle;
+        this.rowHeaderCellStyle = rowHeaderStyle;
     }
 
 }
