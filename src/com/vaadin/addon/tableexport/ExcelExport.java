@@ -31,6 +31,7 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.Table.ColumnGenerator;
 
 /**
@@ -291,7 +292,7 @@ public class ExcelExport extends TableExport {
                 setMimeType(EXCEL_MIME_TYPE);
             }
             final boolean success =
-                    super.sendConvertedFileToUser(getTable().getApplication(), tempFile,
+                    super.sendConvertedFileToUser(getTable().getUI(), tempFile,
                             exportFileName);
             return success;
         } catch (final IOException e) {
@@ -383,7 +384,7 @@ public class ExcelExport extends TableExport {
                     propId).toString()));
             headerCell.setCellStyle(getColumnHeaderStyle(row, col));
 
-            final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
+            final Align vaadinAlignment = this.getTable().getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(headerCell, workbook, poiAlignment);
         }
@@ -531,7 +532,7 @@ public class ExcelExport extends TableExport {
             sheetCell = sheetRow.createCell(col);
             final CellStyle cs = getCellStyle(rootItemId, row, col, false);
             sheetCell.setCellStyle(cs);
-            final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
+            final Align vaadinAlignment = this.getTable().getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(sheetCell, workbook, poiAlignment);
             if (null != value) {
@@ -603,10 +604,10 @@ public class ExcelExport extends TableExport {
         return classType;
     }
 
-    private Short vaadinAlignmentToCellAlignment(final String vaadinAlignment) {
-        if (Table.ALIGN_LEFT.equals(vaadinAlignment)) {
+    private Short vaadinAlignmentToCellAlignment(final Align vaadinAlignment) {
+        if (Align.LEFT.equals(vaadinAlignment)) {
             return CellStyle.ALIGN_LEFT;
-        } else if (Table.ALIGN_RIGHT.equals(vaadinAlignment)) {
+        } else if (Align.RIGHT.equals(vaadinAlignment)) {
             return CellStyle.ALIGN_RIGHT;
         } else {
             return CellStyle.ALIGN_CENTER;
@@ -691,7 +692,7 @@ public class ExcelExport extends TableExport {
             final Object propId = getPropIds().get(col);
             cell = totalsRow.createCell(col);
             cell.setCellStyle(getCellStyle(currentRow, startRow, col, true));
-            final String vaadinAlignment = this.getTable().getColumnAlignment(propId);
+            final Align vaadinAlignment = this.getTable().getColumnAlignment(propId);
             final Short poiAlignment = vaadinAlignmentToCellAlignment(vaadinAlignment);
             CellUtil.setAlignment(cell, workbook, poiAlignment);
             final Class<?> propType = getPropertyType(propId);

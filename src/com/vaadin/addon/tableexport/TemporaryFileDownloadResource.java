@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import com.vaadin.Application;
-import com.vaadin.terminal.DownloadStream;
-import com.vaadin.terminal.StreamResource;
+import com.vaadin.server.DownloadStream;
+import com.vaadin.server.StreamResource;
+import com.vaadin.ui.UI;
 
 /**
  * The Class TemporaryFileDownloadResource.
@@ -38,9 +38,9 @@ public class TemporaryFileDownloadResource extends StreamResource {
      * @throws FileNotFoundException
      *             the file not found exception
      */
-    public TemporaryFileDownloadResource(final Application application, final String fileName,
+    public TemporaryFileDownloadResource(final UI application, final String fileName,
             final String contentType, final File tempFile) throws FileNotFoundException {
-        super(new FileStreamResource(tempFile), fileName, application);
+        super(new FileStreamResource(tempFile), fileName);
         this.filename = fileName;
         this.contentType = contentType;
     }

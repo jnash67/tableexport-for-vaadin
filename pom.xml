@@ -11,15 +11,28 @@
     <packaging>war</packaging>
 
     <properties>
-		<vaadin.version>6.8.7</vaadin.version>
+		<vaadin.version>7.0.0</vaadin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin</artifactId>
+            <artifactId>vaadin-server</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client-compiled</artifactId>
+            <version>${vaadin.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-themes</artifactId>
+            <version>${vaadin.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        
         <dependency>
            <groupId>org.apache.poi</groupId>
            <artifactId>poi</artifactId>

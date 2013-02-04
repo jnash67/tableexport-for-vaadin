@@ -8,13 +8,14 @@ import java.util.Date;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.vaadin.Application;
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -23,11 +24,13 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
-public class TableExportApplication extends Application {
+@Theme("runo")
+public class TableExportUi extends UI {
 
     private static final long serialVersionUID = -5436901535719211794L;
 
@@ -35,10 +38,10 @@ public class TableExportApplication extends Application {
     private SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yy");
     private DecimalFormat df = new DecimalFormat("#0.0000");
 
+    
     @Override
-    public void init() {
-        final Window mainWindow = new Window("Table Export Test");
-        setTheme("runo");
+    protected void init(VaadinRequest request) {
+        getPage().setTitle("Table Export Test");
 
         // Create the table
         container = new BeanItemContainer<PayCheck>(PayCheck.class);
@@ -112,8 +115,13 @@ public class TableExportApplication extends Application {
                 "garbage"});
         table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Taxes Paid",
                 "Is Manager?", "Collapsed Column Test"});
-        table.setColumnAlignments(new String[]{Table.ALIGN_LEFT, Table.ALIGN_CENTER,
-                Table.ALIGN_RIGHT, Table.ALIGN_CENTER, Table.ALIGN_LEFT, Table.ALIGN_LEFT});
+        table.setColumnAlignments(new Align[] {
+                Align.LEFT,
+                Align.CENTER,
+                Align.RIGHT,
+                Align.CENTER,
+                Align.LEFT,
+                Align.LEFT});
         table.setColumnCollapsingAllowed(true);
 
         // create the layout with the export options
@@ -133,7 +141,7 @@ public class TableExportApplication extends Application {
         final CheckBox useTableFormatProperty = new CheckBox("Use Table Format Property", false);
         final CheckBox exportAsCsv = new CheckBox("Export As CSV", false);
         exportAsCsv.setImmediate(true);
-        exportAsCsv.addListener(new ValueChangeListener() {
+        exportAsCsv.addValueChangeListener(new ValueChangeListener() {
             private static final long serialVersionUID = -2031199434445240881L;
 
             @Override
@@ -181,7 +189,7 @@ public class TableExportApplication extends Application {
         final Button noHeaderTestButton = new Button("Andreas No Header Test");
         noHeaderTestButton.setIcon(export);
 
-        regularExportButton.addListener(new ClickListener() {
+        regularExportButton.addClickListener(new ClickListener() {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
 
@@ -219,7 +227,7 @@ public class TableExportApplication extends Application {
                 excelExport.export();
             }
         });
-        overriddenExportButton.addListener(new ClickListener() {
+        overriddenExportButton.addClickListener(new ClickListener() {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
 
@@ -259,7 +267,7 @@ public class TableExportApplication extends Application {
                 excelExport.export();
             }
         });
-        twoTabsExportButton.addListener(new ClickListener() {
+        twoTabsExportButton.addClickListener(new ClickListener() {
             private static final long serialVersionUID = -6704383486117436516L;
             private ExcelExport excelExport;
 
@@ -284,7 +292,7 @@ public class TableExportApplication extends Application {
                 excelExport.export();
             }
         });
-        fontExampleExportButton.addListener(new ClickListener() {
+        fontExampleExportButton.addClickListener(new ClickListener() {
             private static final long serialVersionUID = -73954695086117200L;
             private ExcelExport excelExport;
 
@@ -308,7 +316,7 @@ public class TableExportApplication extends Application {
                 excelExport.export();
             }
         });
-        noHeaderTestButton.addListener(new ClickListener() {
+        noHeaderTestButton.addClickListener(new ClickListener() {
             private static final long serialVersionUID = 9139558937906815722L;
             private ExcelExport excelExport;
 
@@ -339,8 +347,7 @@ public class TableExportApplication extends Application {
         horizontalSpacer.setWidth("15px");
         tableAndOptions.addComponent(horizontalSpacer);
         tableAndOptions.addComponent(options);
-        mainWindow.setContent(tableAndOptions);
-        setMainWindow(mainWindow);
+        setContent(tableAndOptions);
     }
 
     public class PayCheck implements Serializable {
