@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.vaadin.Application;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 
 public abstract class TableExport implements Serializable {
 
@@ -89,20 +89,20 @@ public abstract class TableExport implements Serializable {
      * 
      * @return true, if successful
      */
-    public boolean sendConvertedFileToUser(final Application app, final File fileToExport,
+    public boolean sendConvertedFileToUser(final UI app, final File fileToExport,
             final String exportFileName, final String mimeType) {
         setMimeType(mimeType);
         return sendConvertedFileToUser(app, fileToExport, exportFileName);
 
     }
 
-    protected boolean sendConvertedFileToUser(final Application app, final File fileToExport,
+    protected boolean sendConvertedFileToUser(final UI app, final File fileToExport,
             final String exportFileName) {
         TemporaryFileDownloadResource resource;
         try {
             resource =
                     new TemporaryFileDownloadResource(app, exportFileName, mimeType, fileToExport);
-            app.getMainWindow().open(resource, exportWindow);
+            app.getPage().open(resource, null, false);
         } catch (final FileNotFoundException e) {
             LOGGER.warning("Sending file to user failed with FileNotFoundException " + e);
             return false;
