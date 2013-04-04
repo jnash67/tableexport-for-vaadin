@@ -16,11 +16,6 @@
 			<param-name>UI</param-name>
 			<param-value>com.vaadin.addon.tableexport.TableExportUI</param-value>
 		</init-param>
-		<!-- If not using the default widget set-->
-		<init-param>
-			<param-name>widgetset</param-name>
-			<param-value>com.vaadin.addon.tableexport.widgetset.Tableexport_for_vaadinWidgetset</param-value>
-		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>tableexport</servlet-name>

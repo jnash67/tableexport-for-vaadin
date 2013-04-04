@@ -78,7 +78,7 @@ public class TableExportUI extends UI {
                 return s;
             }
         };
-        table.addStyleName("vert");
+
         table.setContainerDataSource(container);
         table.setColumnCollapsingAllowed(true);
         table.setColumnCollapsed("garbage", true);
@@ -96,8 +96,11 @@ public class TableExportUI extends UI {
                 } else {
                     label = new Label(prop);
                 }
+                label.setSizeUndefined();
+                label.setHeight("100%");
                 return label;
             }
+
             @Override
             public Property getGeneratedProperty(final Object itemId, final Object columnId) {
                 final PayCheck p = (PayCheck) itemId;
@@ -110,12 +113,29 @@ public class TableExportUI extends UI {
             }
         });
 
+        // Set cell style generator
+        table.setCellStyleGenerator(new Table.CellStyleGenerator() {
+            private static final long serialVersionUID = -5871191208927775375L;
+
+            @Override
+            public String
+                    getStyle(final Table source, final Object itemId, final Object propertyId) {
+                if (null == propertyId) {
+                    return null;
+                }
+                if ("taxes".equals(propertyId.toString())) {
+                    return "vert";
+                }
+                return null;
+            }
+        });
+
         // this also sets the order of the columns
         table.setVisibleColumns(new String[]{"name", "date", "amount", "taxes", "manager",
                 "garbage"});
         table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Taxes Paid",
                 "Is Manager?", "Collapsed Column Test"});
-        table.setColumnAlignments(new Align[]{Align.LEFT, Align.CENTER, Align.RIGHT, Align.RIGHT,
+        table.setColumnAlignments(new Align[]{Align.LEFT, Align.CENTER, Align.RIGHT, Align.CENTER,
                 Align.LEFT, Align.LEFT});
         table.setColumnCollapsingAllowed(true);
 
@@ -165,7 +185,7 @@ public class TableExportUI extends UI {
         options.addComponent(exportAsCsv);
 
         // create the export buttons
-        final ThemeResource export = new ThemeResource("../images/table-excel.png");
+        final ThemeResource export = new ThemeResource("img/table-excel.png");
         final Button regularExportButton = new Button("Regular Export");
         regularExportButton.setIcon(export);
 
