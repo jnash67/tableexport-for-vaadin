@@ -29,8 +29,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@Theme("runo")
-public class TableExportUi extends UI {
+@Theme("tableexport-theme")
+public class TableExportUI extends UI {
 
     private static final long serialVersionUID = -5436901535719211794L;
 
@@ -38,9 +38,8 @@ public class TableExportUi extends UI {
     private SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yy");
     private DecimalFormat df = new DecimalFormat("#0.0000");
 
-    
     @Override
-    protected void init(VaadinRequest request) {
+    protected void init(final VaadinRequest request) {
         getPage().setTitle("Table Export Test");
 
         // Create the table
@@ -79,6 +78,7 @@ public class TableExportUi extends UI {
                 return s;
             }
         };
+        table.addStyleName("vert");
         table.setContainerDataSource(container);
         table.setColumnCollapsingAllowed(true);
         table.setColumnCollapsed("garbage", true);
@@ -115,13 +115,8 @@ public class TableExportUi extends UI {
                 "garbage"});
         table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Taxes Paid",
                 "Is Manager?", "Collapsed Column Test"});
-        table.setColumnAlignments(new Align[] {
-                Align.LEFT,
-                Align.CENTER,
-                Align.RIGHT,
-                Align.CENTER,
-                Align.LEFT,
-                Align.LEFT});
+        table.setColumnAlignments(new Align[]{Align.LEFT, Align.CENTER, Align.RIGHT, Align.RIGHT,
+                Align.LEFT, Align.LEFT});
         table.setColumnCollapsingAllowed(true);
 
         // create the layout with the export options
@@ -284,6 +279,9 @@ public class TableExportUi extends UI {
                 if ((Boolean) useTableFormatProperty.getValue()) {
                     excelExport.setUseTableFormatPropertyValue(true);
                 }
+                if (!"".equals(exportFileNameField.getValue().toString())) {
+                    excelExport.setExportFileName(exportFileNameField.getValue().toString());
+                }
                 excelExport.setRowHeaders(((Boolean) rowHeadersField.getValue()).booleanValue());
                 excelExport.setExcelFormatOfProperty("date", excelDateFormat.getValue().toString());
                 excelExport.setDoubleDataFormat(excelNumberFormat.getValue().toString());
@@ -327,7 +325,9 @@ public class TableExportUi extends UI {
                 excelExport.excludeCollapsedColumns();
                 excelExport.setDisplayTotals(true);
                 excelExport.setRowHeaders(false);
-                excelExport.setExportFileName("Tätigkeiten-" + expFormat.format(new Date())
+                // removed umlaut from file name due to Vaadin 7 bug that caused file not to get
+                // written
+                excelExport.setExportFileName("Tatigkeiten-" + expFormat.format(new Date())
                         + ".xls");
                 excelExport.export();
             }

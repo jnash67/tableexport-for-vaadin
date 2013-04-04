@@ -292,8 +292,7 @@ public class ExcelExport extends TableExport {
                 setMimeType(EXCEL_MIME_TYPE);
             }
             final boolean success =
-                    super.sendConvertedFileToUser(getTable().getUI(), tempFile,
-                            exportFileName);
+                    super.sendConvertedFileToUser(getTable().getUI(), tempFile, exportFileName);
             return success;
         } catch (final IOException e) {
             LOGGER.warning("Converting to XLS failed with IOException " + e);
