@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="tableexport-for-vaadin:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/tableexport_for_vaadin_Web_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="javaee-facet-classes" facet="tableexport-for-vaadin/web/Web" />
+          <element id="library" level="application" name="sass-stdlib" />
+          <element id="module-output" name="tableexport-for-vaadin" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Vaadin Server" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="tableexport-for-vaadin/web/Web" />
+    </root>
+  </artifact>
+</component>
