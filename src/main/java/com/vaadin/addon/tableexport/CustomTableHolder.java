@@ -23,7 +23,7 @@ public class CustomTableHolder implements TableHolder {
      * Whether the Container is a HierarchicalContainer or an extension thereof.
      */
     private boolean hierarchical;
-    
+
     private Table table;
     /** The Property ids of the Items in the Table. */
     private LinkedList<Object> propIds;
@@ -54,11 +54,11 @@ public class CustomTableHolder implements TableHolder {
     }
 
     @Override
-    public Short getCellAligment(Object propId) {
+    public Short getCellAlignment(Object propId) {
         final Align vaadinAlignment = table.getColumnAlignment(propId);
         return vaadinAlignmentToCellAlignment(vaadinAlignment);
     }
-    
+
     private Short vaadinAlignmentToCellAlignment(final Align vaadinAlignment) {
         if (Align.LEFT.equals(vaadinAlignment)) {
             return CellStyle.ALIGN_LEFT;
@@ -68,12 +68,12 @@ public class CustomTableHolder implements TableHolder {
             return CellStyle.ALIGN_CENTER;
         }
     }
-    
+
     @Override
     public boolean isGeneratedColumn(final Object propId) throws IllegalArgumentException {
         return table.getColumnGenerator(propId) != null;
     }
-    
+
     @Override
     public Property getPropertyForGeneratedColumn(final Object propId, final Object rootItemId) throws IllegalArgumentException {
         Property prop;
@@ -97,9 +97,9 @@ public class CustomTableHolder implements TableHolder {
         }
         return classType;
     }
-    
+
     @Override
-    public boolean isExportableFormatedProperty() {
+    public boolean isExportableFormattedProperty() {
         return table instanceof ExportableFormattedProperty;
     }
 

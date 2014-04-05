@@ -44,14 +44,10 @@ public class TableExportUI extends UI {
         // Create the table
         container = new BeanItemContainer<PayCheck>(PayCheck.class);
         try {
-            final PayCheck p1 =
-                    new PayCheck("John Smith", sdf.parse("09/17/2011"), 1000.0, true, "garbage1");
-            final PayCheck p2 =
-                    new PayCheck("John Smith", sdf.parse("09/24/2011"), 1000.0, true, "garbage2");
-            final PayCheck p3 =
-                    new PayCheck("Jane Doe", sdf.parse("08/31/2011"), 750.0, false, "garbage3");
-            final PayCheck p4 =
-                    new PayCheck("Jane Doe", sdf.parse("09/07/2011"), 750.0, false, "garbage4");
+            final PayCheck p1 = new PayCheck("John Smith", sdf.parse("09/17/2011"), 1000.0, 2, true, "garbage1");
+            final PayCheck p2 = new PayCheck("John Smith", sdf.parse("09/24/2011"), 1000.0, 1, true, "garbage2");
+            final PayCheck p3 = new PayCheck("Jane Doe", sdf.parse("08/31/2011"), 750.0, 20, false, "garbage3");
+            final PayCheck p4 = new PayCheck("Jane Doe", sdf.parse("09/07/2011"), 750.0, 10000, false, "garbage4");
             container.addBean(p1);
             container.addBean(p2);
             container.addBean(p3);
@@ -63,8 +59,7 @@ public class TableExportUI extends UI {
             private static final long serialVersionUID = -4182827794568302754L;
 
             @Override
-            protected String formatPropertyValue(final Object rowId, final Object colId,
-                    final Property property) {
+            protected String formatPropertyValue(final Object rowId, final Object colId, final Property property) {
                 // Format by property type
                 String s;
                 if (property.getType() == Date.class) {
@@ -85,8 +80,7 @@ public class TableExportUI extends UI {
             private static final long serialVersionUID = -1591034462395284596L;
 
             @Override
-            public Component generateCell(final Table source, final Object itemId,
-                    final Object columnId) {
+            public Component generateCell(final Table source, final Object itemId, final Object columnId) {
                 final Property prop = getGeneratedProperty(itemId, columnId);
                 Label label;
                 final Object v = prop.getValue();
@@ -106,6 +100,7 @@ public class TableExportUI extends UI {
                 final Double tax = .0825 * p.getAmount();
                 return new ObjectProperty<Double>(tax, Double.class);
             }
+
             @Override
             public Class<?> getType() {
                 return Double.class;
@@ -117,8 +112,7 @@ public class TableExportUI extends UI {
             private static final long serialVersionUID = -5871191208927775375L;
 
             @Override
-            public String
-                    getStyle(final Table source, final Object itemId, final Object propertyId) {
+            public String getStyle(final Table source, final Object itemId, final Object propertyId) {
                 if (null == propertyId) {
                     return null;
                 }
@@ -130,11 +124,10 @@ public class TableExportUI extends UI {
         });
 
         // this also sets the order of the columns
-        table.setVisibleColumns(new Object[]{"name", "date", "amount", "taxes", "manager",
-                "garbage"});
-        table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Taxes Paid",
+        table.setVisibleColumns(new Object[]{"name", "date", "amount", "weeks", "taxes", "manager", "garbage"});
+        table.setColumnHeaders(new String[]{"Name", "Date", "Amount Earned", "Weeks Worked", "Taxes Paid",
                 "Is Manager?", "Collapsed Column Test"});
-        table.setColumnAlignments(new Align[]{Align.LEFT, Align.CENTER, Align.RIGHT, Align.CENTER,
+        table.setColumnAlignments(new Align[]{Align.LEFT, Align.CENTER, Align.RIGHT, Align.RIGHT, Align.CENTER,
                 Align.LEFT, Align.LEFT});
         table.setColumnCollapsingAllowed(true);
 
@@ -251,9 +244,7 @@ public class TableExportUI extends UI {
                     if ((Boolean) exportAsCsv.getValue()) {
                         excelExport = new CsvExport(table, sheetNameField.getValue().toString());
                     } else {
-                        excelExport =
-                                new EnhancedFormatExcelExport(table, sheetNameField.getValue()
-                                        .toString());
+                        excelExport = new EnhancedFormatExcelExport(table, sheetNameField.getValue().toString());
                     }
                 } else {
                     if ((Boolean) exportAsCsv.getValue()) {
@@ -287,11 +278,9 @@ public class TableExportUI extends UI {
 
             @Override
             public void buttonClick(final ClickEvent event) {
-                excelExport =
-                        new ExcelExport(table, sheetNameField.getValue().toString(),
-                                reportTitleField.getValue().toString(), exportFileNameField
-                                        .getValue().toString(), ((Boolean) totalsRowField
-                                        .getValue()).booleanValue());
+                excelExport = new ExcelExport(table, sheetNameField.getValue().toString(),
+                        reportTitleField.getValue().toString(), exportFileNameField.getValue().toString(),
+                        ((Boolean) totalsRowField.getValue()).booleanValue());
                 if ((Boolean) excludeCollapsedColumns.getValue()) {
                     excelExport.excludeCollapsedColumns();
                 }
@@ -315,8 +304,7 @@ public class TableExportUI extends UI {
 
             @Override
             public void buttonClick(final ClickEvent event) {
-                excelExport =
-                        new FontExampleExcelExport(table, sheetNameField.getValue().toString());
+                excelExport = new FontExampleExcelExport(table, sheetNameField.getValue().toString());
                 if ((Boolean) excludeCollapsedColumns.getValue()) {
                     excelExport.excludeCollapsedColumns();
                 }
@@ -346,8 +334,7 @@ public class TableExportUI extends UI {
                 excelExport.setRowHeaders(false);
                 // removed umlaut from file name due to Vaadin 7 bug that caused file not to get
                 // written
-                excelExport.setExportFileName("Tatigkeiten-" + expFormat.format(new Date())
-                        + ".xls");
+                excelExport.setExportFileName("Tatigkeiten-" + expFormat.format(new Date()) + ".xls");
                 excelExport.export();
             }
         });
@@ -374,15 +361,17 @@ public class TableExportUI extends UI {
         private String name;
         private Date date;
         private double amount;
+        private int weeks;
         private boolean manager;
         private Object garbage;
 
-        public PayCheck(final String name, final Date date, final double amount,
-                final boolean manager, final Object garbageToIgnore) {
+        public PayCheck(final String name, final Date date, final double amount, final int weeks,
+                        final boolean manager, final Object garbageToIgnore) {
             super();
             this.name = name;
             this.date = date;
             this.amount = amount;
+            this.weeks = weeks;
             this.manager = manager;
             this.garbage = garbageToIgnore;
         }
@@ -399,6 +388,10 @@ public class TableExportUI extends UI {
             return this.amount;
         }
 
+        public int getWeeks() {
+            return this.weeks;
+        }
+
         public boolean isManager() {
             return this.manager;
         }
@@ -413,6 +406,10 @@ public class TableExportUI extends UI {
 
         public void setAmount(final double amount) {
             this.amount = amount;
+        }
+
+        public void setWeeks(final int weeks) {
+            this.weeks = weeks;
         }
 
         public void setManager(final boolean manager) {

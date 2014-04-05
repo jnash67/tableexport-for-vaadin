@@ -1,12 +1,11 @@
 package com.vaadin.addon.tableexport;
 
+import com.vaadin.ui.Table;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
-
-import com.vaadin.ui.Table;
 
 public class FontExampleExcelExport extends ExcelExport {
     private static final long serialVersionUID = 3717947558186318581L;
@@ -55,7 +54,7 @@ public class FontExampleExcelExport extends ExcelExport {
         style.setTopBorderColor(HSSFColor.BLACK.index);
         style.setBottomBorderColor(HSSFColor.BLACK.index);
 
-        style = this.getTotalsStyle();
+        style = this.getTotalsDoubleStyle();
         style.setFillForegroundColor(HSSFColor.WHITE.index);
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         f = workbook.createFont();
@@ -75,6 +74,25 @@ public class FontExampleExcelExport extends ExcelExport {
         style.setBottomBorderColor(HSSFColor.BLACK.index);
 
         style = this.getDoubleDataStyle();
+        style.setFillForegroundColor(HSSFColor.WHITE.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        f = workbook.getFontAt(style.getFontIndex());
+        f.setFontHeightInPoints((short) 12);
+        f.setFontName(HSSFFont.FONT_ARIAL);
+        f.setColor(HSSFColor.BLACK.index);
+        f.setBoldweight(Font.BOLDWEIGHT_NORMAL);
+        style.setFont(f);
+        style.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        style.setLeftBorderColor(HSSFColor.BLACK.index);
+        style.setRightBorderColor(HSSFColor.BLACK.index);
+        style.setTopBorderColor(HSSFColor.BLACK.index);
+        style.setBottomBorderColor(HSSFColor.BLACK.index);
+
+        style = this.getIntegerDataStyle();
         style.setFillForegroundColor(HSSFColor.WHITE.index);
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         f = workbook.getFontAt(style.getFontIndex());

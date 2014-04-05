@@ -7,11 +7,12 @@
         https://vaadin.com/forum#!/thread/5166129
         and
         https://github.com/mstahv/vodatime/tree/vaadin7
+        The jar is built with: mvn install assembly:single
     -->
 
     <groupId>groupId</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <name>TableExport</name>
 
     <properties>
