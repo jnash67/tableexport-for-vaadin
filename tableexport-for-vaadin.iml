@@ -13,7 +13,6 @@
     <facet type="gwt" name="GWT">
       <configuration>
         <setting name="additionalCompilerParameters" value="-Xss512m -XX:MaxPermSize=1024m" />
-        <setting name="compilerParameters" value="-draftCompile" />
         <setting name="compilerMaxHeapSize" value="1024" />
         <setting name="gwtScriptOutputStyle" value="PRETTY" />
         <setting name="gwtSdkUrl" value="file://C:\dropbox\lib\local-maven-repository/com/vaadin/vaadin-client/7.1.11" />
@@ -73,7 +72,7 @@
     <orderEntry type="library" name="Maven: com.vaadin:vaadin-themes:7.1.11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.9" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.10-FINAL" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.5" level="project" />
   </component>
 </module>

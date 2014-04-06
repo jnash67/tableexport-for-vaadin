@@ -12,7 +12,7 @@
 
     <groupId>groupId</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.1.1</version>
     <name>TableExport</name>
 
     <properties>
@@ -92,13 +92,12 @@
             <scope>provided</scope>
         </dependency>
         <!--
-  Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
+          Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
 
-  For widgetset compilation, vaadin-client-compiler is automatically added on the
-  compilation classpath by vaadin-maven-plugin so normally there is no need for an
-  explicit dependency.
--->
-        <!--
+          For widgetset compilation, vaadin-client-compiler is automatically added on the
+          compilation classpath by vaadin-maven-plugin so normally there is no need for an
+          explicit dependency.
+
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client-compiler</artifactId>
@@ -131,7 +130,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.9</version>
+            <version>3.10-FINAL</version>
         </dependency>
     </dependencies>
     <build>
@@ -162,14 +161,16 @@
                             <!-- Package format version - do not change -->
                             <Vaadin-Package-Version>1</Vaadin-Package-Version>
 
-                            <!-- Comma-separated list of widgetsets in the package -->
-                            <!-- TODO figure out a way make this automatically configured -->
+                            <!-- UNCOMMENT FOR PROJECTS THAT HAVE A WIDGETSET
+                            Comma-separated list of widgetsets in the package
                             <Vaadin-Widgetsets>org.vaadin.addon.vodatime.Widgetset</Vaadin-Widgetsets>
+                            -->
                         </manifestEntries>
                     </archive>
                     <excludes>
-                        <!-- Remove resources included due to gwt compilation -->
+                        <!-- Remove resources included due to gwt compilation
                         <exclude>**/demoandtestapp/*</exclude>
+                        -->
                     </excludes>
                 </configuration>
             </plugin>
@@ -187,7 +188,6 @@
                     </execution>
                 </executions>
             </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -260,38 +260,6 @@
 
         <pluginManagement>
             <plugins>
-                <!-- Compile widget set for integration testing -->
-                <plugin>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>vaadin-maven-plugin</artifactId>
-                    <version>${vaadin.version}</version>
-                    <configuration>
-                        <webappDirectory>${project.build.directory}/testwebapp/VAADIN/widgetsets</webappDirectory>
-                        <extraJvmArgs>-Xmx1024M -Xss512m -XX:MaxPermSize=1024m</extraJvmArgs>
-                        <hostedWebapp>${project.build.directory}/testwebapp</hostedWebapp>
-                        <noServer>true</noServer>
-                        <runTarget>http://localhost:9998/</runTarget>
-                        <draftCompile>true</draftCompile>
-                        <style>PRETTY</style>
-                        <!-- We only need to compile the test widgetset, if not defined gwt
-                        module will also compile the add-on widgetset as well -->
-                        <module>org.vaadin.addon.vodatime.demoandtestapp.TestWidgetset</module>
-                        <!-- If you do lots of e.g. plain css changes and don't wish to use
-                        hosted mode, you can force compile easily with uncommenting following rule -->
-                        <force>true</force>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <excludes>
-                            <!-- Files here might match to naming convetions, but the are just
-                            vaadin apps containing you add-on components in varios setups. We can ignore
-                            them from test. -->
-                            <exclude>**/demoandtestapp/*</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings
                 only. It has no influence on the Maven build itself. -->
                 <plugin>
