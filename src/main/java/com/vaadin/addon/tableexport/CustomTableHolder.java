@@ -3,9 +3,9 @@ package com.vaadin.addon.tableexport;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.Align;
-import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.CustomTable;
+import com.vaadin.ui.CustomTable.Align;
+import com.vaadin.ui.CustomTable.ColumnGenerator;
 import com.vaadin.ui.UI;
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
  * @author thomas
  */
 public class CustomTableHolder implements TableHolder {
@@ -24,11 +23,13 @@ public class CustomTableHolder implements TableHolder {
      */
     private boolean hierarchical;
 
-    private Table table;
-    /** The Property ids of the Items in the Table. */
+    private CustomTable table;
+    /**
+     * The Property ids of the Items in the Table.
+     */
     private LinkedList<Object> propIds;
 
-    public CustomTableHolder(Table table) {
+    public CustomTableHolder(CustomTable table) {
         this.table = table;
         this.propIds = new LinkedList<Object>(Arrays.asList(table.getVisibleColumns()));
         if (HierarchicalContainer.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
@@ -75,7 +76,8 @@ public class CustomTableHolder implements TableHolder {
     }
 
     @Override
-    public Property getPropertyForGeneratedColumn(final Object propId, final Object rootItemId) throws IllegalArgumentException {
+    public Property getPropertyForGeneratedColumn(final Object propId, final Object rootItemId) throws
+            IllegalArgumentException {
         Property prop;
         final ColumnGenerator tcg = table.getColumnGenerator(propId);
         if (tcg instanceof CustomTableExportableColumnGenerator) {

@@ -1,7 +1,7 @@
 package com.vaadin.addon.tableexport;
 
 import com.vaadin.data.Property;
-import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.CustomTable.ColumnGenerator;
 
 public interface CustomTableExportableColumnGenerator extends ColumnGenerator {
 
