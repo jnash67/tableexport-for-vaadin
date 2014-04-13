@@ -4,12 +4,13 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.ui.UI;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author thomas
  */
-public interface TableHolder {
+public interface TableHolder extends Serializable {
 
     List<Object> getPropIds();
     boolean isHierarchical();

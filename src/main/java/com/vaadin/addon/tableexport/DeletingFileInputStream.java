@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * This input stream deletes the given file when the InputStream is closed; intended to be used with
@@ -12,7 +13,7 @@ import java.io.IOException;
  * Code obtained from: http://vaadin.com/forum/-/message_boards/view_message/159583
  * 
  */
-class DeletingFileInputStream extends FileInputStream {
+class DeletingFileInputStream extends FileInputStream implements Serializable {
 
     /** The file. */
     protected File file = null;

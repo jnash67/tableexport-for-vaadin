@@ -18,12 +18,6 @@
  */
 package com.vaadin.addon.tableexport;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-
 import org.apache.poi.hssf.eventusermodel.EventWorkbookBuilder.SheetRecordCollectingListener;
 import org.apache.poi.hssf.eventusermodel.FormatTrackingHSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
@@ -49,13 +43,20 @@ import org.apache.poi.hssf.record.StringRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 /**
  * A XLS -> CSV processor, that uses the MissingRecordAware EventModel code to ensure it outputs all
  * columns and rows.
  * 
  * @author Nick Burch
  */
-public class XLS2CSVmra implements HSSFListener {
+public class XLS2CSVmra implements HSSFListener, Serializable {
     private int minColumns;
     private POIFSFileSystem fs;
     private PrintStream output;
