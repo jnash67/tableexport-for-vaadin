@@ -10,15 +10,23 @@
         The jar is built with: mvn install assembly:single
     -->
 
-    <groupId>groupId</groupId>
+    <groupId>org.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
-    <version>1.5.1.3</version>
+    <version>1.5.1.4</version>
     <name>TableExport</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vaadin.version>7.1.11</vaadin.version>
         <skipTests>true</skipTests>
+        <vaadin.version>7.2.3</vaadin.version>
+        <!-- commons-io : We use version 2.2 because that's the version that's a Vaadin dependency -->
+        <commons-io.version>2.2</commons-io.version>
+        <apache-poi.version>3.10-FINAL</apache-poi.version>
+        <filteringtable.addon.version>0.9.8.v7</filteringtable.addon.version>
+        <!-- plugins -->
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
+        <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
     </properties>
 
     <!-- google only supports https:, not git: or ssh: -->
@@ -121,21 +129,20 @@
             <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
-        <!-- using commons-io 2.2 because that's the version that's a Vaadin 7 dependency -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.2</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.10-FINAL</version>
+            <version>${apache-poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>filteringtable</artifactId>
-            <version>0.9.8.v7</version>
+            <version>${filteringtable.addon.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -144,6 +151,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -153,7 +161,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <archive>
                         <index>true</index>
@@ -184,7 +192,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>${maven-source-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

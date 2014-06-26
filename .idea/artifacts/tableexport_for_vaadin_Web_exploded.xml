@@ -4,7 +4,6 @@
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
-          <element id="javaee-facet-classes" facet="tableexport-for-vaadin/web/Web" />
           <element id="library" level="application" name="sass-stdlib" />
           <element id="module-output" name="tableexport-for-vaadin" />
         </element>
