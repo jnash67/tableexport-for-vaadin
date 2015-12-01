@@ -2,7 +2,6 @@ package com.vaadin.addon.tableexport;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.CustomTable.Align;
 import com.vaadin.ui.CustomTable.ColumnGenerator;
@@ -32,7 +31,9 @@ public class CustomTableHolder implements TableHolder {
     public CustomTableHolder(CustomTable table) {
         this.table = table;
         this.propIds = new LinkedList<Object>(Arrays.asList(table.getVisibleColumns()));
-        if (HierarchicalContainer.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
+        // fixed issue pointed out by Mark Lillywhite in the forum and smorygo....@gmail.com on the issues page.
+        // Was comparing to HierarchicalContainer, should have been comparing to Container.Hierarchical.
+        if (Container.Hierarchical.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
             setHierarchical(true);
         } else {
             setHierarchical(false);

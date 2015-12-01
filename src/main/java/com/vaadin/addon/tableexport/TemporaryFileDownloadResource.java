@@ -1,12 +1,12 @@
 package com.vaadin.addon.tableexport;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import com.vaadin.server.DownloadStream;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.UI;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * The Class TemporaryFileDownloadResource.
@@ -71,8 +71,10 @@ public class TemporaryFileDownloadResource extends StreamResource {
         /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 3801605481686085335L;
 
-        /** The input stream. */
-        private final InputStream inputStream;
+        /** The input stream.
+         *  Made it transient per: https://github.com/jnash67/tableexport-for-vaadin/issues/28
+         */
+        private final transient InputStream inputStream;
 
         /**
          * Instantiates a new file stream resource.

@@ -89,7 +89,11 @@ public abstract class TableExport implements Serializable {
         try {
             resource =
                     new TemporaryFileDownloadResource(app, exportFileName, mimeType, fileToExport);
-            app.getPage().open(resource, null, false);
+            if (null == app) {
+                UI.getCurrent().getPage().open(resource, null, false);
+            } else {
+                app.getPage().open(resource, null, false);
+            }
         } catch (final FileNotFoundException e) {
             LOGGER.warning("Sending file to user failed with FileNotFoundException " + e);
             return false;

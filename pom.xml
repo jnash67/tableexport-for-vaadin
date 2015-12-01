@@ -8,39 +8,38 @@
         and
         https://github.com/mstahv/vodatime/tree/vaadin7
         The jar is built with: mvn install assembly:single
-    -->
+   -->
 
     <groupId>org.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
-    <version>1.5.1.5</version>
+    <version>1.6.0</version>
     <name>TableExport</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
-        <vaadin.version>7.2.3</vaadin.version>
+        <vaadin.version>7.5.9</vaadin.version>
         <!-- commons-io : We use version 2.2 because that's the version that's a Vaadin dependency -->
         <commons-io.version>2.2</commons-io.version>
-        <apache-poi.version>3.10-FINAL</apache-poi.version>
-        <filteringtable.addon.version>0.9.8.v7</filteringtable.addon.version>
+        <apache-poi.version>3.13</apache-poi.version>
+        <filteringtable.addon.version>0.9.13.v7</filteringtable.addon.version>
         <!-- plugins -->
-        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
-        <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+        <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+        <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     </properties>
 
-    <!-- google only supports https:, not git: or ssh: -->
+    <!-- migrated from google code to github -->
     <scm>
-        <url>https://code.google.com/p/tableexport-for-vaadin/</url>
-        <connection>scm:git:https://code.google.com/p/tableexport-for-vaadin/</connection>
-        <developerConnection>scm:git:https://code.google.com/p/tableexport-for-vaadin/</developerConnection>
+        <url>https://github.com/jnash67/tableexport-for-vaadin/</url>
+        <connection>scm:git:git://github.com/jnash67/tableexport-for-vaadin.git</connection>
+        <developerConnection>scm:git:git://github.com/jnash67/tableexport-for-vaadin.git</developerConnection>
         <tag>tableexport-for-vaadin add-on</tag>
     </scm>
-
     <issueManagement>
-        <system>code.google.com</system>
-        <url>https://code.google.com/p/tableexport-for-vaadin/issues</url>
+        <system>GitHub Issues</system>
+        <url>https://github.com/jnash67/tableexport-for-vaadin/issues</url>
     </issueManagement>
 
     <licenses>
@@ -86,6 +85,18 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -305,7 +316,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <!-- <ignore></ignore> -->
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -326,7 +337,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <!-- <ignore></ignore> -->
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>

@@ -2,7 +2,6 @@ package com.vaadin.addon.tableexport;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -29,7 +28,9 @@ public class DefaultTableHolder implements TableHolder {
     public DefaultTableHolder(Table table) {
         this.table = table;
         this.propIds = new LinkedList<Object>(Arrays.asList(table.getVisibleColumns()));
-        if (HierarchicalContainer.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
+        // fixed issue pointed out by Mark Lillywhite in the forum and smorygo....@gmail.com on the issues page.
+        // Was comparing to HierarchicalContainer, should have been comparing to Container.Hierarchical.
+        if (Container.Hierarchical.class.isAssignableFrom(table.getContainerDataSource().getClass())) {
             setHierarchical(true);
         } else {
             setHierarchical(false);

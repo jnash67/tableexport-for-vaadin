@@ -8,18 +8,10 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.Serializable;
@@ -131,12 +123,18 @@ public class TableExportUI extends UI {
                 Align.LEFT, Align.LEFT});
         table.setColumnCollapsingAllowed(true);
 
-        // create the layout with the export options
-        final VerticalLayout options = new VerticalLayout();
-        options.setSpacing(true);
-        final Label headerLabel = new Label("Table Export Options");
+        TabSheet optionsTab = new TabSheet();
+        optionsTab.setWidth("400px");
+
+        // create the layout with the main export options
+        final VerticalLayout mainOptions = new VerticalLayout();
+        mainOptions.setSpacing(true);
+        //mainOptions.setWidth("400px");
+        final Label headerLabel = new Label("Export Options");
         final Label verticalSpacer = new Label();
         verticalSpacer.setHeight("10px");
+        final Label endSpacer = new Label();
+        endSpacer.setHeight("10px");
         final TextField reportTitleField = new TextField("Report Title", "Demo Report");
         final TextField sheetNameField = new TextField("Sheet Name", "Table Export");
         final TextField exportFileNameField = new TextField("Export Filename", "Table-Export.xls");
@@ -146,16 +144,16 @@ public class TableExportUI extends UI {
         final CheckBox rowHeadersField = new CheckBox("Treat first Column as Row Headers", true);
         final CheckBox excludeCollapsedColumns = new CheckBox("Exclude Collapsed Columns", true);
         final CheckBox useTableFormatProperty = new CheckBox("Use Table Format Property", false);
-        final CheckBox exportAsCsv = new CheckBox("Export As CSV", false);
-        exportAsCsv.setImmediate(true);
-        exportAsCsv.addValueChangeListener(new ValueChangeListener() {
+        final CheckBox exportAsCsvUsingXLS2CSVmra = new CheckBox("Export As CSV", false);
+        exportAsCsvUsingXLS2CSVmra.setImmediate(true);
+        exportAsCsvUsingXLS2CSVmra.addValueChangeListener(new ValueChangeListener() {
             private static final long serialVersionUID = -2031199434445240881L;
 
             @Override
             public void valueChange(final ValueChangeEvent event) {
                 final String fn = exportFileNameField.getValue().toString();
                 final String justName = FilenameUtils.getBaseName(fn);
-                if ((Boolean) exportAsCsv.getValue()) {
+                if ((Boolean) exportAsCsvUsingXLS2CSVmra.getValue()) {
                     exportFileNameField.setValue(justName + ".csv");
                 } else {
                     exportFileNameField.setValue(justName + ".xls");
@@ -163,18 +161,19 @@ public class TableExportUI extends UI {
                 exportFileNameField.markAsDirty();
             }
         });
-        options.addComponent(headerLabel);
-        options.addComponent(verticalSpacer);
-        options.addComponent(reportTitleField);
-        options.addComponent(sheetNameField);
-        options.addComponent(exportFileNameField);
-        options.addComponent(excelNumberFormat);
-        options.addComponent(excelDateFormat);
-        options.addComponent(totalsRowField);
-        options.addComponent(rowHeadersField);
-        options.addComponent(excludeCollapsedColumns);
-        options.addComponent(useTableFormatProperty);
-        options.addComponent(exportAsCsv);
+
+        mainOptions.addComponent(headerLabel);
+        mainOptions.addComponent(verticalSpacer);
+        mainOptions.addComponent(reportTitleField);
+        mainOptions.addComponent(sheetNameField);
+        mainOptions.addComponent(exportFileNameField);
+        mainOptions.addComponent(excelNumberFormat);
+        mainOptions.addComponent(excelDateFormat);
+        mainOptions.addComponent(totalsRowField);
+        mainOptions.addComponent(rowHeadersField);
+        mainOptions.addComponent(excludeCollapsedColumns);
+        mainOptions.addComponent(useTableFormatProperty);
+        mainOptions.addComponent(exportAsCsvUsingXLS2CSVmra);
 
         // create the export buttons
         final ThemeResource export = new ThemeResource("img/table-excel.png");
@@ -203,13 +202,13 @@ public class TableExportUI extends UI {
             @Override
             public void buttonClick(final ClickEvent event) {
                 if (!"".equals(sheetNameField.getValue().toString())) {
-                    if ((Boolean) exportAsCsv.getValue()) {
+                    if ((Boolean) exportAsCsvUsingXLS2CSVmra.getValue()) {
                         excelExport = new CsvExport(table, sheetNameField.getValue().toString());
                     } else {
                         excelExport = new ExcelExport(table, sheetNameField.getValue().toString());
                     }
                 } else {
-                    if ((Boolean) exportAsCsv.getValue()) {
+                    if ((Boolean) exportAsCsvUsingXLS2CSVmra.getValue()) {
                         excelExport = new CsvExport(table);
                     } else {
                         excelExport = new ExcelExport(table);
@@ -241,13 +240,13 @@ public class TableExportUI extends UI {
             @Override
             public void buttonClick(final ClickEvent event) {
                 if (!"".equals(sheetNameField.getValue().toString())) {
-                    if ((Boolean) exportAsCsv.getValue()) {
+                    if ((Boolean) exportAsCsvUsingXLS2CSVmra.getValue()) {
                         excelExport = new CsvExport(table, sheetNameField.getValue().toString());
                     } else {
                         excelExport = new EnhancedFormatExcelExport(table, sheetNameField.getValue().toString());
                     }
                 } else {
-                    if ((Boolean) exportAsCsv.getValue()) {
+                    if ((Boolean) exportAsCsvUsingXLS2CSVmra.getValue()) {
                         excelExport = new CsvExport(table);
                     } else {
                         excelExport = new EnhancedFormatExcelExport(table);
@@ -338,11 +337,54 @@ public class TableExportUI extends UI {
                 excelExport.export();
             }
         });
-        options.addComponent(regularExportButton);
-        options.addComponent(overriddenExportButton);
-        options.addComponent(twoTabsExportButton);
-        options.addComponent(fontExampleExportButton);
-        options.addComponent(noHeaderTestButton);
+        mainOptions.addComponent(regularExportButton);
+        mainOptions.addComponent(overriddenExportButton);
+        mainOptions.addComponent(twoTabsExportButton);
+        mainOptions.addComponent(fontExampleExportButton);
+        mainOptions.addComponent(noHeaderTestButton);
+        mainOptions.addComponent(endSpacer);
+
+        // create the layout with the csv export using java csv
+        final VerticalLayout javaCsvOptions = new VerticalLayout();
+        javaCsvOptions.setSpacing(true);
+        final Label javaCsvHeaderLabel = new Label("Export Options");
+        final Label javaCsvDesc = new Label("If you go through the Apache POI library, there is an export limit of 65,536 rows.  To avoid this you can use the Java Csv library and code contributed by Marco Petris.  However, this currently does not have any additional functionality (e.g. the output column order is alphabetic and there's no way to override formats).");
+        final Label javaCsvVerticalSpacer = new Label();
+        javaCsvVerticalSpacer.setHeight("10px");
+        final Label endSpacer2 = new Label();
+        endSpacer2.setHeight("10px");
+        final TextField javaCsvExportFileNameField = new TextField("Export Filename", "Table-Export.csv");
+        final CheckBox exportAsCsvUsingJavaCsv = new CheckBox("Export As CSV using Java CVS", false);
+        exportAsCsvUsingJavaCsv.setValue(true);
+        exportAsCsvUsingJavaCsv.setEnabled(false);
+
+        javaCsvOptions.addComponent(javaCsvHeaderLabel);
+        javaCsvOptions.addComponent(javaCsvDesc);
+        javaCsvOptions.addComponent(javaCsvVerticalSpacer);
+        javaCsvOptions.addComponent(javaCsvExportFileNameField);
+        javaCsvOptions.addComponent(exportAsCsvUsingJavaCsv);
+
+        final Button javaCsvExportButton = new Button("Export");
+        javaCsvExportButton.setIcon(export);
+        javaCsvExportButton.addClickListener(new ClickListener() {
+            private static final long serialVersionUID = -73954695086117200L;
+            private TableExport exportUsingJavaCsv;
+
+            @Override
+            public void buttonClick(final ClickEvent event) {
+                if (!"".equals(sheetNameField.getValue().toString())) {
+                    exportUsingJavaCsv = new CsvExportUsingJavaCsv(table, javaCsvExportFileNameField.getValue().toString());
+                } else {
+                    exportUsingJavaCsv = new CsvExportUsingJavaCsv(table, "Table-Export.csv");
+                }
+                exportUsingJavaCsv.export();
+            }
+        });
+        javaCsvOptions.addComponent(javaCsvExportButton);
+        javaCsvOptions.addComponent(endSpacer2);
+
+        optionsTab.addTab(mainOptions, "Main");
+        optionsTab.addTab(javaCsvOptions, "Java Csv Export");
 
         // add to window
         final HorizontalLayout tableAndOptions = new HorizontalLayout();
@@ -352,7 +394,7 @@ public class TableExportUI extends UI {
         final Label horizontalSpacer = new Label();
         horizontalSpacer.setWidth("15px");
         tableAndOptions.addComponent(horizontalSpacer);
-        tableAndOptions.addComponent(options);
+        tableAndOptions.addComponent(optionsTab);
         setContent(tableAndOptions);
     }
 

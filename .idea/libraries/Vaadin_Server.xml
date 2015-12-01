@@ -10,7 +10,9 @@
       <root url="file://$PROJECT_DIR$/../../../lib/vaadin/vaadin-all-7.1.11/lib" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../lib/vaadin/vaadin-all-7.1.11/vaadin-server-7.1.11.jar!/" />
+    </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/../../../lib/vaadin/vaadin-all-7.1.11/lib" recursive="false" />
   </library>
 </component>
