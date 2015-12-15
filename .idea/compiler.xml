@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="Javac" />
     <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
@@ -19,14 +18,14 @@
       </profile>
       <profile default="false" name="Annotation profile for tableexport-for-vaadin" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="tableexport-for-vaadin" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="tableexport-for-vaadin" target="1.6" />
+      <module name="tableexport-for-vaadin" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

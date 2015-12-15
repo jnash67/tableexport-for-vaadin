@@ -22,8 +22,21 @@ public class EnhancedFormatExcelExport extends ExcelExport {
         this(table, "Enhanced Export");
     }
 
+    public EnhancedFormatExcelExport(final TableHolder tableHolder) {
+        this(tableHolder, "Enhanced Export");
+    }
+
+    public EnhancedFormatExcelExport(final TableHolder tableHolder, final String sheetName) {
+        super(tableHolder, sheetName);
+        format();
+    }
+
     public EnhancedFormatExcelExport(final Table table, final String sheetName) {
         super(table, sheetName);
+        format();
+    }
+
+    private void format() {
         this.setRowHeaders(true);
         CellStyle style;
         Font f;
