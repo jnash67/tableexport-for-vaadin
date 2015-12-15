@@ -1,55 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- for more info on creating addon with Maven see:
-        https://vaadin.com/forum#!/thread/5166129
-        and
-        https://github.com/mstahv/vodatime/tree/vaadin7
-        The jar is built with: mvn install assembly:single
-   -->
+    <!--
+    The add-on is assembled with mvn install assembly:single
+    It puts the jar created by the "install" into a zip file with a manifest.
+    -->
 
-    <groupId>org.vaadin.addon</groupId>
+    <groupId>com.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
-    <version>1.6.0</version>
-    <name>TableExport</name>
+    <packaging>jar</packaging>
+    <version>1.6.1</version>
+    <name>tableexport-for-vaadin</name>
+
+    <organization>
+        <name>Vaadin Community</name>
+        <url>http://vaadin.com/forum/</url>
+    </organization>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <skipTests>true</skipTests>
-        <vaadin.version>7.5.9</vaadin.version>
-        <!-- commons-io : We use version 2.2 because that's the version that's a Vaadin dependency -->
+        <vaadin.version>7.5.10</vaadin.version>
+        <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+        <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
+        <project.source.version>1.7</project.source.version>
+        <project.target.version>1.7</project.target.version>
+        <project.encoding>UTF-8</project.encoding>
         <commons-io.version>2.2</commons-io.version>
         <apache-poi.version>3.13</apache-poi.version>
         <filteringtable.addon.version>0.9.13.v7</filteringtable.addon.version>
         <!-- plugins -->
-        <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+        <maven-war-plugin.version>2.3</maven-war-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+        <maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
+        <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
+        <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
+        <!-- ZIP Manifest fields -->
+        <Implementation-Version>${project.version}</Implementation-Version>
+        <!-- Must not change this because of the Directory -->
+        <Implementation-Title>${project.name}</Implementation-Title>
+        <Vaadin-License-Title>Apache License 2.0</Vaadin-License-Title>
+        <Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
     </properties>
-
-    <!-- migrated from google code to github -->
-    <scm>
-        <url>https://github.com/jnash67/tableexport-for-vaadin/</url>
-        <connection>scm:git:git://github.com/jnash67/tableexport-for-vaadin.git</connection>
-        <developerConnection>scm:git:git://github.com/jnash67/tableexport-for-vaadin.git</developerConnection>
-        <tag>tableexport-for-vaadin add-on</tag>
-    </scm>
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/jnash67/tableexport-for-vaadin/issues</url>
-    </issueManagement>
-
-    <licenses>
-        <license>
-            <name>Apache 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
 
     <repositories>
         <repository>
@@ -57,34 +51,16 @@
             <url>http://maven.vaadin.com/vaadin-addons</url>
         </repository>
         <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>vaadin-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>vaadin-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+            <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -100,15 +76,23 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
-            <version>${vaadin.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <!-- provided by the container running the application -->
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-push</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client</artifactId>
-            <version>${vaadin.version}</version>
             <scope>provided</scope>
         </dependency>
         <!--
@@ -117,32 +101,19 @@
           For widgetset compilation, vaadin-client-compiler is automatically added on the
           compilation classpath by vaadin-maven-plugin so normally there is no need for an
           explicit dependency.
-
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client-compiler</artifactId>
-            <version>${vaadin.version}</version>
-            <scope>provided</scope>
-        </dependency>
         -->
         <!--
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-push</artifactId>
-            <version>${vaadin.version}</version>
+            <artifactId>vaadin-client-compiler</artifactId>
+            <scope>provided</scope>
         </dependency>
         -->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-themes</artifactId>
-            <version>${vaadin.version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -153,13 +124,27 @@
             <artifactId>poi</artifactId>
             <version>${apache-poi.version}</version>
         </dependency>
+        <!-- FilterTable needs to be provided in webapp/WEB-INF/lib.
+        Even though it's on Maven, I suspect because it itself is an Ivy project and not a Maven project
+        that transitive dependencies aren't being pulled in.
+        FilteringTable 0.9.13v7 uses popupbutton 2.5.0 as a dependency which we also provide.
+        -->
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>filteringtable</artifactId>
             <version>${filteringtable.addon.version}</version>
+            <!-- jar should be placed in src\main\webapp\WEB-INF\lib -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>popupbutton</artifactId>
+            <version>2.5.0</version>
+            <!-- jar should be placed in src\main\webapp\WEB-INF\lib -->
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -167,8 +152,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <encoding>${project.encoding}</encoding>
+                    <source>${project.source.version}</source>
+                    <target>${project.target.version}</target>
                 </configuration>
             </plugin>
 
@@ -188,30 +174,52 @@
                         <manifestEntries>
                             <!-- Package format version - do not change -->
                             <Vaadin-Package-Version>1</Vaadin-Package-Version>
-
-                            <!-- UNCOMMENT FOR PROJECTS THAT HAVE A WIDGETSET
-                            Comma-separated list of widgetsets in the package
-                            <Vaadin-Widgetsets>org.vaadin.addon.vodatime.Widgetset</Vaadin-Widgetsets>
-                            -->
+                            <!--<Vaadin-Widgetsets>org.vaadin.addon.vodatime.Widgetset</Vaadin-Widgetsets>-->
                         </manifestEntries>
                     </archive>
                     <excludes>
-                        <!-- Remove resources included due to gwt compilation
-                        <exclude>**/demoandtestapp/*</exclude>
-                        -->
+                    <!-- Remove widgetset resources.  We want to exclude these since they
+                      aren't needed by the add-on and are only useful in running the test UI. -->
+                        <exclude>**/gwt-unitCache/**</exclude>
+                        <exclude>**/widgetsets/**</exclude>
+                        <exclude>**/VAADIN/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven-source-plugin.version}</version>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven-war-plugin.version}</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <!-- Exclude some unnecessary files generated by the GWT compiler. -->
+                    <packagingExcludes>WEB-INF/classes/VAADIN/gwt-unitCache/**,
+                        WEB-INF/classes/VAADIN/widgetsets/WEB-INF/**
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.plugin.version}</version>
+                <configuration>
+                    <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+                    <webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
+                    <draftCompile>false</draftCompile>
+                    <compileReport>false</compileReport>
+                    <style>OBF</style>
+                    <strict>true</strict>
+                </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>update-theme</goal>
+                            <goal>update-widgetset</goal>
+                            <goal>compile</goal>
+                            <!-- disabled by default to use on-the-fly theme compilation -->
+                            <!-- <goal>compile-theme</goal> -->
                         </goals>
                     </execution>
                 </executions>
@@ -236,61 +244,74 @@
                 </executions>
             </plugin>
 
-
-            <!-- This creates a zip file of jar and sources jar. When publishing in
-            the Directory this makes sources available to maven users automatically.
-            We could also use this to package required dependecies for those poor developer
-            souls that still dont know how to use a build system that supports transient
-            dependencies... -->
+            <!-- This creates a zip file of the jar and add's a manifest -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <finalName>${project.artifactId}-${project.version}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
-                        <descriptor>assembly.xml</descriptor>
+                        <descriptor>assembly/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-maven-plugin</artifactId>
-                <version>${vaadin.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>testwidgetset</id>
-                        <phase>test-compile</phase>
                         <goals>
-                            <goal>compile</goal>
+                            <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <skip>${skipTests}</skip>
-                        </configuration>
+                        <phase>install</phase>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven-clean-plugin.version}</version>
+                <!-- Clean up also any pre-compiled themes -->
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>src/main/webapp/VAADIN/themes</directory>
+                            <includes>
+                                <include>**/styles.css</include>
+                                <include>**/styles.scss.cache</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <!-- The Jetty plugin allows us to easily test the development build by
+                running jetty:run on the command line. -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.plugin.version}</version>
+                <configuration>
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
+                    <stopKey/>
+                    <stopPort/>
+                </configuration>
+            </plugin>
         </plugins>
 
+        <!--
+         The jar:jar goal creates a jar file for project classes including resources. We want source
+         files added so we add those as a resource.
+        -->
         <resources>
             <resource>
-                <!-- This add sources, .gwt.xml files etc to jar from source directory.
-                Not quite maven convention byt easieast to setup this way. -->
                 <directory>src/main/java</directory>
-            </resource>
-            <!-- This is here to simplify working with GWT plugin during test widgetset
-            compilation. Test widgetset is this way more like a real world usage and
-            also lets your test up to e.g. use other add-ons. Ensure these are excluded
-            from the artifact ( jar file ). -->
-            <resource>
-                <directory>src/test/resources</directory>
             </resource>
         </resources>
 
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings
-                only. It has no influence on the Maven build itself. -->
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!-- TODO Remove when http://dev.vaadin.com/ticket/14924 is resolved -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -300,44 +321,21 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId>
-                                            com.vaadin
-                                        </groupId>
+                                        <groupId>com.vaadin</groupId>
                                         <artifactId>
                                             vaadin-maven-plugin
                                         </artifactId>
-                                        <versionRange>
-                                            [2.3.0-1,)
-                                        </versionRange>
+                                        <versionRange>[7.1.11,)</versionRange>
                                         <goals>
-                                            <goal>
-                                                compile
-                                            </goal>
+                                            <goal>resources</goal>
+                                            <goal>update-widgetset</goal>
+                                            <goal>compile</goal>
+                                            <goal>compile-theme</goal>
+                                            <goal>update-theme</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <!-- <ignore></ignore> -->
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.apache.maven.plugins
-                                        </groupId>
-                                        <artifactId>
-                                            maven-dependency-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [2.0.0,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>
-                                                copy-dependencies
-                                            </goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <!-- <ignore></ignore> -->
+                                        <ignore></ignore>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -346,5 +344,30 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
     </build>
+
+    <profiles>
+        <profile>
+            <!-- Vaadin pre-release repositories -->
+            <id>vaadin-prerelease</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <repositories>
+                <repository>
+                    <id>vaadin-prereleases</id>
+                    <url>http://maven.vaadin.com/vaadin-prereleases</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>vaadin-prereleases</id>
+                    <url>http://maven.vaadin.com/vaadin-prereleases</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
 </project>

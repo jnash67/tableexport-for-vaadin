@@ -15,14 +15,7 @@
     <fileSets>
         <fileSet>
             <directory>target</directory>
-            <outputDirectory>./</outputDirectory>
-            <includes>
-                <include>*-${project.version}*.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>target/libs</directory>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory></outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
@@ -33,7 +26,7 @@
         <!-- Use a MANIFEST.MF file in zip, required by vaadin.com/directory. The
             file draws required details automatically from pom.xml -->
         <file>
-            <source>MANIFEST.MF</source>
+            <source>assembly/MANIFEST.MF</source>
             <outputDirectory>META-INF</outputDirectory>
             <filtered>true</filtered>
         </file>

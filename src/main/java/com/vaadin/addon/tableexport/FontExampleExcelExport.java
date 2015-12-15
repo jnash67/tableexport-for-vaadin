@@ -10,8 +10,17 @@ import org.apache.poi.ss.usermodel.Font;
 public class FontExampleExcelExport extends ExcelExport {
     private static final long serialVersionUID = 3717947558186318581L;
 
+    public FontExampleExcelExport(final TableHolder tableHolder, final String sheetName) {
+        super(tableHolder, sheetName);
+        format();
+    }
+
     public FontExampleExcelExport(final Table table, final String sheetName) {
         super(table, sheetName);
+        format();
+    }
+
+    private void format() {
         this.setRowHeaders(true);
         CellStyle style;
         Font f;
