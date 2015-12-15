@@ -21,11 +21,26 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="tableexport-for-vaadin" />
+      </profile>
+      <profile default="false" name="Annotation profile for tableexport-for-vaadin (1)" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="tableexport-for-vaadin (1)" />
+      </profile>
+      <profile default="false" name="Annotation profile for tableexport-for-vaadin-demo" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="tableexport-for-vaadin-demo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="tableexport-for-vaadin" target="1.7" />
+      <module name="tableexport-for-vaadin (1)" target="1.7" />
+      <module name="tableexport-for-vaadin-demo" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,5 +1,13 @@
-package com.vaadin.addon.tableexport;
+package com.vaadin.addon.tableexport.demo;
 
+import com.vaadin.addon.tableexport.CsvExport;
+import com.vaadin.addon.tableexport.CsvExportUsingJavaCsv;
+import com.vaadin.addon.tableexport.DefaultTableHolder;
+import com.vaadin.addon.tableexport.ExcelExport;
+import com.vaadin.addon.tableexport.ExportableColumnGenerator;
+import com.vaadin.addon.tableexport.PropertyFormatTable;
+import com.vaadin.addon.tableexport.TableExport;
+import com.vaadin.addon.tableexport.TableHolder;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
@@ -38,7 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Theme("tableexport-theme")
-@Widgetset("com.vaadin.addon.tableexport.TableExportWidgetset")
+@Widgetset("com.vaadin.addon.tableexport.demo.TableExportWidgetset")
 public class TableExportUI extends UI {
 
     private static final long serialVersionUID = -5436901535719211794L;

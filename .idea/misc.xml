@@ -11,6 +11,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/tableexport-demo/pom.xml" />
+        <option value="$PROJECT_DIR$/tableexport/pom.xml" />
       </list>
     </option>
   </component>

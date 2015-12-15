@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/tableexport-for-vaadin.iml" filepath="$PROJECT_DIR$/tableexport-for-vaadin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tableexport/tableexport-for-vaadin.iml" filepath="$PROJECT_DIR$/tableexport/tableexport-for-vaadin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tableexport-demo/tableexport-for-vaadin-demo.iml" filepath="$PROJECT_DIR$/tableexport-demo/tableexport-for-vaadin-demo.iml" />
     </modules>
   </component>
 </project>
