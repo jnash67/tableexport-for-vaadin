@@ -1,44 +1,24 @@
-tableexport-for-vaadin
-==============
+# TableExport Add-on for Vaadin 7
 
-Template for a simple Vaadin application that only requires a Servlet 3.0 container to run.
+TableExport is a Data Component add-on for Vaadin 7.  Legacy versions of the add-on that
+worked with Vaadin 6 should still be available on the Vaadin.com site.
 
+## Overview
+* Exporting data to Excel or CSV formats is a common task that comes up time and again. The solution can figured out from various forum posts but it takes a while to put everything together, especially the writing of the Excel file to the browser.
+* This add-on takes a Table as input and exports a decent Excel file containing the data in the Container. It also handles HierarchicalContainers and the resulting Excel file will have the categories and subcategories properly grouped/outlined.
+* There are a number of configurable properties. The user can specify a worksheet name, a report title, and an output file name. The user can also specify if there should be a Totals row at the bottom of the export. The user can pass in custom POI CellStyles. However, if none of these are specified, the user only needs to pass in a Table.
+* This add-on requires the Apache POI library.
+* This add-on requires the Apache Commons IO library (http://commons.apache.org/io/).
+* This add-on uses Charles Anthony's solution from: http://vaadin.com/forum/-/message_boards/view_message/159583
+* The included icon comes from the fugue open source (Creative Commons) icon set.
 
-Workflow
-========
+## Building and running demo
 
-To compile the entire project, run "mvn install".
-To run the application, run "mvn jetty:run" and open http://localhost:8080/ .
+* git clone <url of the github repository>
+* mvn clean install
+* cd tableexport-demo
+* mvn jetty:run
 
-To develop the theme, simply update the relevant theme files and reload the application.
-Pre-compiling a theme eliminates automatic theme updates at runtime - see below for more information.
+## License
 
-Debugging client side code
-  - run "mvn vaadin:run-codeserver" on a separate console while the application is running
-  - activate Super Dev Mode in the debug window of the application
-
-To produce a deployable production mode WAR:
-- change productionMode to true in the servlet class configuration (nested in the UI class)
-- run "mvn clean vaadin:compile-theme package"
-  - See below for more information. Running "mvn clean" removes the pre-compiled theme.
-- test with "mvn jetty:run-war
-
-Using a precompiled theme
--------------------------
-
-When developing the application, Vaadin can compile the theme on the fly when needed,
-or the theme can be precompiled to speed up page loads.
-
-To precompile the theme run "mvn vaadin:compile-theme". Note, though, that once
-the theme has been precompiled, any theme changes will not be visible until the
-next theme compilation or running the "mvn clean" target.
-
-When developing the theme, running the application in the "run" mode (rather than
-in "debug") in the IDE can speed up consecutive on-the-fly theme compilations
-significantly.
-
-Using Vaadin pre-releases
--------------------------
-
-If Vaadin pre-releases are not enabled by default, use the Maven parameter
-"-P vaadin-prerelease" or change the activation default value of the profile in pom.xml .
+Add-on is distributed under Apache License 2.0. For license terms, see LICENSE.txt.
