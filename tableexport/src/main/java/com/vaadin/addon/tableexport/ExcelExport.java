@@ -719,14 +719,10 @@ public class ExcelExport extends TableExport {
         // if not over-ridden, use the overall setting
         if (isDoubleOrFloat(propType)) {
             return dataFormatCellStylesMap.get(doubleDataFormat);
-        } else {
-            if (isIntegerLongShortOrBigDecimal(propType)) {
-                return dataFormatCellStylesMap.get(integerDataFormat);
-            } else {
-                if (java.util.Date.class.isAssignableFrom(propType)) {
-                    return dataFormatCellStylesMap.get(dateDataFormat);
-                }
-            }
+        } else if (isIntegerLongShortOrBigDecimal(propType)) {
+            return dataFormatCellStylesMap.get(integerDataFormat);
+        } else if (java.util.Date.class.isAssignableFrom(propType)) {
+            return dataFormatCellStylesMap.get(dateDataFormat);
         }
         return dataFormatCellStylesMap.get(doubleDataFormat);
     }
