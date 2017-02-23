@@ -2,7 +2,7 @@ package com.vaadin.addon.tableexport.demo;
 
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.addon.tableexport.TableHolder;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.ui.Table;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.util.HSSFColor;

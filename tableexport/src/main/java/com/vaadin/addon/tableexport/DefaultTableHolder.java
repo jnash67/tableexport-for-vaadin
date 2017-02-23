@@ -1,9 +1,9 @@
 package com.vaadin.addon.tableexport;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.Property;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.ui.Grid;
+import com.vaadin.v7.ui.Table;
 import com.vaadin.ui.UI;
 import org.apache.poi.ss.usermodel.CellStyle;
 

@@ -6,7 +6,7 @@
     <groupId>com.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin-root</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.2</version>
+    <version>1.8.0</version>
     <name>TableExport Add-on Root</name>
 
 	<modules>

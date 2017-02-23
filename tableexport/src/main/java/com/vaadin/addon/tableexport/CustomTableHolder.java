@@ -1,10 +1,10 @@
 package com.vaadin.addon.tableexport;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.Property;
-import com.vaadin.ui.CustomTable;
-import com.vaadin.ui.CustomTable.Align;
-import com.vaadin.ui.CustomTable.ColumnGenerator;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.ui.CustomTable;
+import com.vaadin.v7.ui.CustomTable.Align;
+import com.vaadin.v7.ui.CustomTable.ColumnGenerator;
 import com.vaadin.ui.UI;
 import org.apache.poi.ss.usermodel.CellStyle;
 
