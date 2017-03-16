@@ -28,7 +28,6 @@
         <project.encoding>UTF-8</project.encoding>
         <commons-io.version>2.2</commons-io.version>
         <apache-poi.version>3.13</apache-poi.version>
-        <filteringtable.addon.version>0.9.15.v8-exp-v8</filteringtable.addon.version>
         <!-- plugins -->
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
@@ -95,16 +94,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${apache-poi.version}</version>
-        </dependency>
-        <!-- FilterTable needs to be provided in webapp/WEB-INF/lib.
-        Even though it's on Maven, I suspect because it itself is an Ivy project and not a Maven project
-        that transitive dependencies aren't being pulled in.
-        FilteringTable 0.9.13v7 uses popupbutton 2.5.0 as a dependency which we also provide.
-        -->
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>filteringtable</artifactId>
-            <version>${filteringtable.addon.version}</version>
         </dependency>
     </dependencies>
 
