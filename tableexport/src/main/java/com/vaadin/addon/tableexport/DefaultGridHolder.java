@@ -20,7 +20,7 @@ public class DefaultGridHolder implements TableHolder {
 
     private boolean hierarchical = false;
 
-    private Grid<?> heldGrid;
+    protected Grid<?> heldGrid;
 
     public DefaultGridHolder(Grid<?> grid) {
         this.heldGrid = grid;
@@ -111,11 +111,11 @@ public class DefaultGridHolder implements TableHolder {
         throw new UnsupportedOperationException();
     }
     
-    private Column<?,?> getColumn(Object propId) {
+    protected Column<?,?> getColumn(Object propId) {
     	return heldGrid.getColumn((String) propId);
     }
 
-    private Renderer<?> getRenderer(Object propId) {
+    protected Renderer<?> getRenderer(Object propId) {
     	// Grid.Column (as of 8.0.3) does not expose its renderer, we have to get it from extensions
     	Column<?,?> column = getColumn(propId);
     	if (column != null) {

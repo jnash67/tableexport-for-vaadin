@@ -23,8 +23,8 @@ public class DefaultTableHolder implements TableHolder {
      */
     private boolean hierarchical;
 
-    private Table heldTable;
-    private Grid heldGrid;
+    protected Table heldTable;
+    protected Grid heldGrid;
     private Container container;
     /**
      * The Property ids of the Items in the Table.

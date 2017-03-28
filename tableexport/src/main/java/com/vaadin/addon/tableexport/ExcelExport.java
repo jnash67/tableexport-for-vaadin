@@ -552,7 +552,7 @@ public class ExcelExport extends TableExport {
      * @param row        the row
      * @return the int
      */
-    private int addDataRowRecursively(final Sheet sheetToAddTo, final Object rootItemId, final int row) {
+    protected int addDataRowRecursively(final Sheet sheetToAddTo, final Object rootItemId, final int row) {
         int numberAdded = 0;
         int localRow = row;
         addDataRow(sheetToAddTo, rootItemId, row);
