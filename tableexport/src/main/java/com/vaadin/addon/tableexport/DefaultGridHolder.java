@@ -2,6 +2,7 @@ package com.vaadin.addon.tableexport;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,14 +22,16 @@ public class DefaultGridHolder implements TableHolder {
     private boolean hierarchical = false;
 
     protected Grid<?> heldGrid;
+    private List<Object> propIds;
 
     public DefaultGridHolder(Grid<?> grid) {
         this.heldGrid = grid;
+        this.propIds = heldGrid.getColumns().stream().map(Column::getId).collect(Collectors.toList());
     }
 
     @Override
     public List<Object> getPropIds() {
-        return heldGrid.getColumns().stream().map(Column::getId).collect(Collectors.toList());
+        return propIds;
     }
 
     @Override

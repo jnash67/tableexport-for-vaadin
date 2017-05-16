@@ -514,11 +514,24 @@ public class ExcelExport extends TableExport {
             }
             if (count > 1) {
                 sheet.groupRow(localRow + 1, (localRow + count) - 1);
-                sheet.setRowGroupCollapsed(localRow + 1, true);
+                if (collapseRowGroup(rootId)) {
+                	sheet.setRowGroupCollapsed(localRow + 1, true);
+                }
             }
             localRow = localRow + count;
         }
         return localRow;
+    }
+
+    /**
+     * Determines if a group rooted in object {@code rootId} should be collapsed or not.
+     * By default, all rows of the hierarchical containers are not collapsed.
+     *
+     * @param rootId
+     * @return
+     */
+    protected boolean collapseRowGroup(Object rootId) {
+      return true;
     }
 
     /**
@@ -582,30 +595,37 @@ public class ExcelExport extends TableExport {
             value = getTableHolder().getPropertyValue(rootItemId, propId, useTableFormatPropertyValue);
             valueType = getTableHolder().getPropertyType(propId);
             sheetCell = sheetRow.createCell(col);
-            final CellStyle cs = getCellStyle(rootItemId, row, col, false);
-            sheetCell.setCellStyle(cs);
-            final Short poiAlignment = getTableHolder().getCellAlignment(propId);
-            CellUtil.setAlignment(sheetCell, workbook, poiAlignment);
-            if (null != value) {
-                if (!isNumeric(valueType)) {
-                    if (java.util.Date.class.isAssignableFrom(valueType)) {
-                        sheetCell.setCellValue((Date) value);
-                    } else {
-                        sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
-                    }
-                } else {
-                    try {
-                        // parse all numbers as double, the format will determine how they appear
-                        final Double d = Double.parseDouble(value.toString());
-                        sheetCell.setCellValue(d);
-                    } catch (final NumberFormatException nfe) {
-                        LOGGER.warning("NumberFormatException parsing a numeric value: " + nfe);
-                        sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
-                    }
-                }
-            }
+            setupCell(sheetCell, value, valueType, propId, rootItemId, row, col);
         }
     }
+
+    protected void setupCell(Cell sheetCell, Object value, Class<?> valueType, Object propId, Object rootItemId, int row, int col) {
+        sheetCell.setCellStyle(getCellStyle(propId, rootItemId, row, col, false));
+        Short poiAlignment = getTableHolder().getCellAlignment(propId);
+        CellUtil.setAlignment(sheetCell, workbook, poiAlignment);
+        setCellValue(sheetCell, value, valueType, propId);
+    }
+    
+	protected void setCellValue(Cell sheetCell, Object value, Class<?> valueType, Object propId) {
+		if (null != value) {
+		    if (!isNumeric(valueType)) {
+		        if (java.util.Date.class.isAssignableFrom(valueType)) {
+		            sheetCell.setCellValue((Date) value);
+		        } else {
+		            sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
+		        }
+		    } else {
+		        try {
+		            // parse all numbers as double, the format will determine how they appear
+		            final Double d = Double.parseDouble(value.toString());
+		            sheetCell.setCellValue(d);
+		        } catch (final NumberFormatException nfe) {
+		            LOGGER.warning("NumberFormatException parsing a numeric value: " + nfe);
+		            sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
+		        }
+		    }
+		}
+	}
 
     public void setExcelFormatOfProperty(final Object propertyId, final String excelFormat) {
         if (this.propertyExcelFormatMap.containsKey(propertyId)) {
@@ -622,13 +642,13 @@ public class ExcelExport extends TableExport {
      * potentially relevant items that may be used to determine what formatting to return, that are
      * not accessible globally.
      *
+     * @param propertyId the property id
      * @param rootItemId the root item id
      * @param row        the row
      * @param col        the col
      * @return the data style
      */
-    protected CellStyle getCellStyle(final Object rootItemId, final int row, final int col, final boolean totalsRow) {
-        final Object propId = getPropIds().get(col);
+    protected CellStyle getCellStyle(final Object propId, final Object rootItemId, final int row, final int col, final boolean totalsRow) {
         // get the basic style for the type of cell (i.e. data, header, total)
         if ((rowHeaders) && (col == 0)) {
             if (null == rowHeaderCellStyle) {
@@ -692,32 +712,35 @@ public class ExcelExport extends TableExport {
         totalsRow = sheet.createRow(currentRow);
         totalsRow.setHeightInPoints(30);
         Cell cell;
-        CellRangeAddress cra;
         for (int col = 0; col < getPropIds().size(); col++) {
             final Object propId = getPropIds().get(col);
             cell = totalsRow.createCell(col);
-            cell.setCellStyle(getCellStyle(currentRow, startRow, col, true));
-            final Short poiAlignment = getTableHolder().getCellAlignment(propId);
-            CellUtil.setAlignment(cell, workbook, poiAlignment);
-            final Class<?> propType = getTableHolder().getPropertyType(propId);
-            if (isNumeric(propType)) {
-                cra = new CellRangeAddress(startRow, currentRow - 1, col, col);
-                if (isHierarchical()) {
-                    // 9 & 109 are for sum. 9 means include hidden cells, 109 means exclude.
-                    // this will show the wrong value if the user expands an outlined category, so
-                    // we will range value it first
-                    cell.setCellFormula("SUM(" + cra.formatAsString(hierarchicalTotalsSheet.getSheetName(),
-                            true) + ")");
-                } else {
-                    cell.setCellFormula("SUM(" + cra.formatAsString() + ")");
-                }
-            } else {
-                if (0 == col) {
-                    cell.setCellValue(createHelper.createRichTextString("Total"));
-                }
-            }
+            setupTotalCell(cell, propId, currentRow, startRow, col);
         }
     }
+
+	protected void setupTotalCell(Cell cell, final Object propId, final int currentRow, final int startRow, int col) {
+		cell.setCellStyle(getCellStyle(propId, currentRow, startRow, col, true));
+		Short poiAlignment = getTableHolder().getCellAlignment(propId);
+		CellUtil.setAlignment(cell, workbook, poiAlignment);
+		Class<?> propType = getTableHolder().getPropertyType(propId);
+		if (isNumeric(propType)) {
+			CellRangeAddress cra = new CellRangeAddress(startRow, currentRow - 1, col, col);
+		    if (isHierarchical()) {
+		        // 9 & 109 are for sum. 9 means include hidden cells, 109 means exclude.
+		        // this will show the wrong value if the user expands an outlined category, so
+		        // we will range value it first
+		        cell.setCellFormula("SUM(" + cra.formatAsString(hierarchicalTotalsSheet.getSheetName(),
+		                true) + ")");
+		    } else {
+		        cell.setCellFormula("SUM(" + cra.formatAsString() + ")");
+		    }
+		} else {
+		    if (0 == col) {
+		        cell.setCellValue(createHelper.createRichTextString("Total"));
+		    }
+		}
+	}
 
     /**
      * Final formatting of the sheet upon completion of writing the data. For example, we can only
