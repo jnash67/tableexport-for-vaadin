@@ -7,37 +7,21 @@
     The add-on is assembled with mvn install assembly:single
     It puts the jar created by the "install" into a zip file with a manifest
     -->
+    <parent>
+        <groupId>com.vaadin.addon</groupId>
+        <artifactId>tableexport-for-vaadin-root</artifactId>
+        <version>1.6.3-SNAPSHOT</version>
+    </parent>
 
     <groupId>com.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.2</version>
     <name>TableExport</name>
 
     <organization>
         <name>Vaadin Community</name>
         <url>http://vaadin.com/forum/</url>
     </organization>
-
-    <properties>
-        <vaadin.version>7.5.10</vaadin.version>
-        <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-        <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
-        <project.source.version>1.7</project.source.version>
-        <project.target.version>1.7</project.target.version>
-        <project.encoding>UTF-8</project.encoding>
-        <commons-io.version>2.2</commons-io.version>
-        <apache-poi.version>3.13</apache-poi.version>
-        <filteringtable.addon.version>0.9.13.v7</filteringtable.addon.version>
-        <!-- plugins -->
-        <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
-        <maven-war-plugin.version>2.3</maven-war-plugin.version>
-        <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
-        <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
-        <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
-    </properties>
 
     <repositories>
         <repository>
@@ -141,8 +125,8 @@
                         </manifestEntries>
                     </archive>
                     <excludes>
-                    <!-- Remove widgetset resources.  We want to exclude these since they
-                      aren't needed by the add-on and are only useful in running the test UI. -->
+                        <!-- Remove widgetset resources.  We want to exclude these since they
+                        aren't needed by the add-on and are only useful in running the test UI. -->
                         <exclude>**/gwt-unitCache/**</exclude>
                         <exclude>**/widgetsets/**</exclude>
                         <exclude>**/VAADIN/**</exclude>
