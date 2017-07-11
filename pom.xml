@@ -23,7 +23,6 @@
         <project.encoding>UTF-8</project.encoding>
         <commons-io.version>2.5</commons-io.version>
         <apache-poi.version>3.16</apache-poi.version>
-        <filteringtable.addon.version>0.9.15.v7</filteringtable.addon.version>
         <!-- plugins -->
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>

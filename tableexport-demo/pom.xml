@@ -17,7 +17,7 @@
     <packaging>war</packaging>
     <!-- first version of demo separated out from the addon -->
     <version>1.0</version>
-    <name>TableExport-Demo</name>
+    <name>TableExport Demo</name>
 
     <organization>
         <name>Vaadin Community</name>
@@ -78,26 +78,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
-        </dependency>
-
-        <!-- FilterTable needs to be provided in webapp/WEB-INF/lib.
-        Even though it's on Maven, I suspect because it itself is an Ivy project and not a Maven project
-        that transitive dependencies aren't being pulled in.
-        FilteringTable 0.9.13v7 uses popupbutton 2.5.0 as a dependency which we also provide.
-        -->
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>filteringtable</artifactId>
-            <version>${filteringtable.addon.version}</version>
-            <!-- jar should be placed in src\main\webapp\WEB-INF\lib -->
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>popupbutton</artifactId>
-            <version>2.5.0</version>
-            <!-- jar should be placed in src\main\webapp\WEB-INF\lib -->
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
