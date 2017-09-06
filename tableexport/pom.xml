@@ -11,7 +11,7 @@
     <groupId>com.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.2</version>
+    <version>1.8.0</version>
     <name>TableExport</name>
 
     <organization>
@@ -20,19 +20,15 @@
     </organization>
 
     <properties>
-        <vaadin.version>7.5.10</vaadin.version>
-        <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+        <vaadin.version>8.0.3</vaadin.version>
         <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
-        <project.source.version>1.7</project.source.version>
-        <project.target.version>1.7</project.target.version>
+        <project.source.version>1.8</project.source.version>
+        <project.target.version>1.8</project.target.version>
         <project.encoding>UTF-8</project.encoding>
-        <commons-io.version>2.2</commons-io.version>
         <apache-poi.version>3.13</apache-poi.version>
-        <filteringtable.addon.version>0.9.13.v7</filteringtable.addon.version>
         <!-- plugins -->
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
-        <maven-war-plugin.version>2.3</maven-war-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
         <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
@@ -78,33 +74,18 @@
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
+            <artifactId>vaadin-compatibility-server</artifactId>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client</artifactId>
+            <artifactId>vaadin-compatibility-client</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${apache-poi.version}</version>
-        </dependency>
-        <!-- FilterTable needs to be provided in webapp/WEB-INF/lib.
-        Even though it's on Maven, I suspect because it itself is an Ivy project and not a Maven project
-        that transitive dependencies aren't being pulled in.
-        FilteringTable 0.9.13v7 uses popupbutton 2.5.0 as a dependency which we also provide.
-        -->
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>filteringtable</artifactId>
-            <version>${filteringtable.addon.version}</version>
         </dependency>
     </dependencies>
 
@@ -140,59 +121,7 @@
                             <!--<Vaadin-Widgetsets>org.vaadin.addon.vodatime.Widgetset</Vaadin-Widgetsets>-->
                         </manifestEntries>
                     </archive>
-                    <excludes>
-                    <!-- Remove widgetset resources.  We want to exclude these since they
-                      aren't needed by the add-on and are only useful in running the test UI. -->
-                        <exclude>**/gwt-unitCache/**</exclude>
-                        <exclude>**/widgetsets/**</exclude>
-                        <exclude>**/VAADIN/**</exclude>
-                        <exclude>rebel.xml</exclude>
-                    </excludes>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-maven-plugin</artifactId>
-                <version>${vaadin.plugin.version}</version>
-                <configuration>
-                    <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-                    <webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
-                    <draftCompile>false</draftCompile>
-                    <compileReport>false</compileReport>
-                    <style>OBF</style>
-                    <strict>true</strict>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>update-theme</goal>
-                            <goal>update-widgetset</goal>
-                            <goal>compile</goal>
-                            <!-- disabled by default to use on-the-fly theme compilation -->
-                            <!-- <goal>compile-theme</goal> -->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeScope>runtime</includeScope>
-                            <outputDirectory>target/libs</outputDirectory>
-                            <!-- configure the plugin here -->
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- This creates a zip file of the jar and add's a manifest -->
@@ -215,24 +144,6 @@
                         <phase>install</phase>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>${maven-clean-plugin.version}</version>
-                <!-- Clean up also any pre-compiled themes -->
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>src/main/webapp/VAADIN/themes</directory>
-                            <includes>
-                                <include>**/styles.css</include>
-                                <include>**/styles.scss.cache</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
             </plugin>
         </plugins>
 

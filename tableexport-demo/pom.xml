@@ -10,8 +10,7 @@
     <groupId>com.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin-demo</artifactId>
     <packaging>war</packaging>
-    <!-- first version of demo separated out from the addon -->
-    <version>1.0</version>
+    <version>1.8.0</version>
     <name>TableExport-Demo</name>
 
     <organization>
@@ -20,16 +19,15 @@
     </organization>
 
     <properties>
-        <tableexport.version>1.6.2</tableexport.version>
-        <vaadin.version>7.5.10</vaadin.version>
+        <tableexport.version>1.8.0</tableexport.version>
+        <vaadin.version>8.0.3</vaadin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
         <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
-        <project.source.version>1.7</project.source.version>
-        <project.target.version>1.7</project.target.version>
+        <project.source.version>1.8</project.source.version>
+        <project.target.version>1.8</project.target.version>
         <project.encoding>UTF-8</project.encoding>
         <commons-io.version>2.2</commons-io.version>
         <apache-poi.version>3.13</apache-poi.version>
-        <filteringtable.addon.version>0.9.13.v7</filteringtable.addon.version>
         <!-- plugins -->
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
@@ -84,7 +82,11 @@
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
+            <artifactId>vaadin-compatibility-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-compatibility-client</artifactId>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
@@ -96,22 +98,10 @@
             <version>${commons-io.version}</version>
         </dependency>
 
-        <!-- FilterTable needs to be provided in webapp/WEB-INF/lib.
-        Even though it's on Maven, I suspect because it itself is an Ivy project and not a Maven project
-        that transitive dependencies aren't being pulled in.
-        FilteringTable 0.9.13v7 uses popupbutton 2.5.0 as a dependency which we also provide.
-        -->
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>filteringtable</artifactId>
-            <version>${filteringtable.addon.version}</version>
-            <!-- jar should be placed in src\main\webapp\WEB-INF\lib -->
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>popupbutton</artifactId>
-            <version>2.5.0</version>
+            <version>3.0.0</version>
             <!-- jar should be placed in src\main\webapp\WEB-INF\lib -->
             <scope>provided</scope>
         </dependency>
@@ -135,7 +125,7 @@
                 <artifactId>vaadin-maven-plugin</artifactId>
                 <version>${vaadin.plugin.version}</version>
                 <configuration>
-                    <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+                    <extraJvmArgs>-Xmx1024M -Xss1024k</extraJvmArgs>
                     <webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
                     <draftCompile>false</draftCompile>
                     <compileReport>false</compileReport>

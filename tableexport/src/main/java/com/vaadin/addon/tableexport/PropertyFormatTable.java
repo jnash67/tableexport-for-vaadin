@@ -1,7 +1,7 @@
 package com.vaadin.addon.tableexport;
 
-import com.vaadin.data.Property;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.ui.Table;
 
 public class PropertyFormatTable extends Table implements ExportableFormattedProperty {
     private static final long serialVersionUID = 3155836832984769425L;

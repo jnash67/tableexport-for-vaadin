@@ -1,6 +1,6 @@
 package com.vaadin.addon.tableexport;
 
-import com.vaadin.ui.Table;
+import com.vaadin.v7.ui.Table;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import java.io.BufferedOutputStream;
