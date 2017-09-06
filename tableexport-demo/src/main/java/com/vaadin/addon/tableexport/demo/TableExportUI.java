@@ -27,6 +27,9 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.data.provider.DataProvider;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -179,7 +182,7 @@ public class TableExportUI extends UI {
         mainOptions.addComponent(exportAsCsvUsingXLS2CSVmra);
 
         // create the export buttons
-        final ThemeResource export = new ThemeResource("img/table-excel.png");
+        final Resource export = FontAwesome.FILE_EXCEL_O;
         final Button regularExportButton = new Button("Regular Export");
         regularExportButton.setIcon(export);
 
@@ -428,7 +431,7 @@ public class TableExportUI extends UI {
         mainOptions.addComponent(exportAsCsvUsingXLS2CSVmra);
 
         // create the export buttons
-        final ThemeResource export = new ThemeResource("img/table-excel.png");
+        final Resource export = FontAwesome.FILE_EXCEL_O;
         final Button regularExportButton = new Button("Regular Export");
         regularExportButton.setIcon(export);
 
@@ -720,7 +723,7 @@ public class TableExportUI extends UI {
         mainOptions.addComponent(exportAsCsvUsingXLS2CSVmra);
 
         // create the export buttons
-        final ThemeResource export = new ThemeResource("img/table-excel.png");
+        final Resource export = FontAwesome.FILE_EXCEL_O;
         final Button regularExportButton = new Button("Regular Export");
         regularExportButton.setIcon(export);
 

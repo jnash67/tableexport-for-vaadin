@@ -10,7 +10,6 @@
     <groupId>com.vaadin.addon</groupId>
     <artifactId>tableexport-for-vaadin-demo</artifactId>
     <packaging>war</packaging>
-    <!-- first version of demo separated out from the addon -->
     <version>1.8.0</version>
     <name>TableExport-Demo</name>
 
