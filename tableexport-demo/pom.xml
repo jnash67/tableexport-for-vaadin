@@ -20,7 +20,7 @@
 
     <properties>
         <tableexport.version>1.8.0</tableexport.version>
-        <vaadin.version>8.0.3</vaadin.version>
+        <vaadin.version>8.1.5</vaadin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
         <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
         <project.source.version>1.8</project.source.version>

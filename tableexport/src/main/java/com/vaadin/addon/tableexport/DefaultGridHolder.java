@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 
+import com.vaadin.data.HasHierarchicalDataProvider;
 import com.vaadin.data.provider.Query;
 import com.vaadin.server.Extension;
 import com.vaadin.ui.Grid;
@@ -27,6 +28,7 @@ public class DefaultGridHolder implements TableHolder {
     public DefaultGridHolder(Grid<?> grid) {
         this.heldGrid = grid;
         this.propIds = heldGrid.getColumns().stream().map(Column::getId).collect(Collectors.toList());
+        setHierarchical(grid instanceof HasHierarchicalDataProvider);
     }
 
     @Override
@@ -119,14 +121,9 @@ public class DefaultGridHolder implements TableHolder {
     }
 
     protected Renderer<?> getRenderer(Object propId) {
-    	// Grid.Column (as of 8.0.3) does not expose its renderer, we have to get it from extensions
     	Column<?,?> column = getColumn(propId);
     	if (column != null) {
-    		for (Extension each : column.getExtensions()) {
-    			if (each instanceof Renderer<?>) {
-    				return (Renderer<?>) each;
-    			}
-    		}
+    		return column.getRenderer();
     	}
     	return null;
     }
@@ -149,7 +146,11 @@ public class DefaultGridHolder implements TableHolder {
 
     @Override
     public Collection<?> getChildren(Object rootItemId) {
-     	return Collections.emptyList();
+    	if (heldGrid instanceof HasHierarchicalDataProvider) {
+    		return ((HasHierarchicalDataProvider) heldGrid).getTreeData().getChildren(rootItemId);
+        } else {
+        	return Collections.emptyList();
+        }
     }
     
     @Override
@@ -159,7 +160,11 @@ public class DefaultGridHolder implements TableHolder {
 
     @Override
     public Collection<?> getRootItemIds() {
-    	return getItemIds();
+    	if (heldGrid instanceof HasHierarchicalDataProvider) {
+    		return ((HasHierarchicalDataProvider) heldGrid).getTreeData().getRootItems();
+    	} else {
+    		return getItemIds();
+    	}
     }
 
 }
