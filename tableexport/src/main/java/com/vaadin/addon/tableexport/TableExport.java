@@ -1,13 +1,12 @@
 package com.vaadin.addon.tableexport;
 
-import com.vaadin.v7.ui.Table;
-import com.vaadin.ui.UI;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Logger;
+
+import com.vaadin.ui.UI;
 
 public abstract class TableExport implements Serializable {
 
@@ -25,10 +24,6 @@ public abstract class TableExport implements Serializable {
 
     protected String mimeType;
 
-    public TableExport(final Table table) {
-        this.setTable(table);
-    }
-
     public TableExport(TableHolder tableHolder) {
         this.tableHolder = tableHolder;
     }
@@ -41,10 +36,6 @@ public abstract class TableExport implements Serializable {
         return tableHolder.getPropIds();
     }
 
-    public final void setTable(final Table table) {
-        tableHolder = new DefaultTableHolder(table);
-    }
-    
     public void setTableHolder(final TableHolder tableHolder) {
         this.tableHolder = tableHolder;
     }

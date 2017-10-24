@@ -1,8 +1,5 @@
 package com.vaadin.addon.tableexport;
 
-import com.vaadin.v7.ui.Table;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,30 +8,34 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.logging.Logger;
 
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+
+import com.vaadin.ui.Grid;
+
 public class CsvExport extends ExcelExport {
     private static final long serialVersionUID = 935966816321924835L;
     private static final Logger LOGGER = Logger.getLogger(CsvExport.class.getName());
 
-    public CsvExport(final Table table) {
-        super(table);
+    public CsvExport(final Grid<?> grid) {
+        super(grid);
     }
 
-    public CsvExport(final Table table, final String sheetName) {
-        super(table, sheetName);
+    public CsvExport(final Grid<?> grid, final String sheetName) {
+        super(grid, sheetName);
     }
 
-    public CsvExport(final Table table, final String sheetName, final String reportTitle) {
-        super(table, sheetName, reportTitle);
+    public CsvExport(final Grid<?> grid, final String sheetName, final String reportTitle) {
+        super(grid, sheetName, reportTitle);
     }
 
-    public CsvExport(final Table table, final String sheetName, final String reportTitle,
+    public CsvExport(final Grid<?> grid, final String sheetName, final String reportTitle,
             final String exportFileName) {
-        super(table, sheetName, reportTitle, exportFileName);
+        super(grid, sheetName, reportTitle, exportFileName);
     }
 
-    public CsvExport(final Table table, final String sheetName, final String reportTitle,
+    public CsvExport(final Grid<?> grid, final String sheetName, final String reportTitle,
             final String exportFileName, final boolean hasTotalsRow) {
-        super(table, sheetName, reportTitle, exportFileName, hasTotalsRow);
+        super(grid, sheetName, reportTitle, exportFileName, hasTotalsRow);
     }
     
     public CsvExport(final TableHolder tableHolder) {

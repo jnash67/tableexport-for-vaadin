@@ -57,7 +57,9 @@ import java.util.ArrayList;
  * @author Nick Burch
  */
 public class XLS2CSVmra implements HSSFListener, Serializable {
-    private int minColumns;
+	private static final long serialVersionUID = -2228412980552255809L;
+	
+	private int minColumns;
     private POIFSFileSystem fs;
     private PrintStream output;
 

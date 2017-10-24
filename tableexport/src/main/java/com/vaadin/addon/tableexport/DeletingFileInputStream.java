@@ -15,7 +15,9 @@ import java.io.Serializable;
  */
 class DeletingFileInputStream extends FileInputStream implements Serializable {
 
-    /** The file. */
+	private static final long serialVersionUID = 3840351665563343001L;
+	
+	/** The file. */
     protected File file = null;
 
     /**

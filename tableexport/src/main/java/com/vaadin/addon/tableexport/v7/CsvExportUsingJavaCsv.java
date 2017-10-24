@@ -1,6 +1,7 @@
-package com.vaadin.addon.tableexport;
+package com.vaadin.addon.tableexport.v7;
 
 import com.csvreader.CsvWriter;
+import com.vaadin.addon.tableexport.TableExport;
 import com.vaadin.v7.ui.Table;
 import de.catma.util.CloseSafe;
 import de.catma.util.IDGenerator;
@@ -15,6 +16,7 @@ import java.nio.charset.Charset;
 /* From Marco Petris comment on https://vaadin.com/forum/#!/thread/579717/579716 and
    https://github.com/mpetris/catma/blob/master/src/de/catma/ui/component/export/CsvExport.java
  */
+@Deprecated
 public class CsvExportUsingJavaCsv extends TableExport {
 
     public static class CsvExportException extends RuntimeException {
@@ -29,7 +31,7 @@ public class CsvExportUsingJavaCsv extends TableExport {
     private String exportFileName;
 
     public CsvExportUsingJavaCsv(Table table, String exportFileName) {
-        super(table);
+        super(new DefaultTableHolder(table));
         this.table = table;
         this.exportFileName = exportFileName;
     }

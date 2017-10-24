@@ -2,7 +2,6 @@ package com.vaadin.addon.tableexport;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,7 +9,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 
 import com.vaadin.data.HasHierarchicalDataProvider;
 import com.vaadin.data.provider.Query;
-import com.vaadin.server.Extension;
+import com.vaadin.server.SerializableFunction;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.UI;
@@ -66,11 +65,6 @@ public class DefaultGridHolder implements TableHolder {
     }
 
     @Override
-    public com.vaadin.v7.data.Property getPropertyForGeneratedColumn(final Object propId, final Object rootItemId) throws IllegalArgumentException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Class<?> getPropertyTypeForGeneratedColumn(final Object propId) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
     }
@@ -106,16 +100,6 @@ public class DefaultGridHolder implements TableHolder {
         }
     }
 
-    @Override
-    public com.vaadin.v7.data.Container getContainerDataSource() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getFormattedPropertyValue(Object rowId, Object colId, com.vaadin.v7.data.Property property) {
-        throw new UnsupportedOperationException();
-    }
-    
     protected Column<?,?> getColumn(Object propId) {
     	return heldGrid.getColumn((String) propId);
     }
@@ -140,8 +124,8 @@ public class DefaultGridHolder implements TableHolder {
 
     @Override
     public Object getPropertyValue(Object itemId, Object propId, boolean useTableFormatPropertyValue) {
-    	Column column = getColumn(propId);
-    	return column.getValueProvider().apply(itemId);
+    	SerializableFunction valueProvider = getColumn(propId).getValueProvider();
+    	return valueProvider.apply(itemId);
     }
 
     @Override

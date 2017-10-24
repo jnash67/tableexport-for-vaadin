@@ -52,34 +52,17 @@
         </repository>
     </repositories>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-bom</artifactId>
-                <version>${vaadin.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <!-- provided by the container running the application -->
-            <scope>provided</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+            <version>${vaadin.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-compatibility-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-compatibility-client</artifactId>
-            <scope>provided</scope>
+            <version>${vaadin.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -118,7 +101,6 @@
                         <manifestEntries>
                             <!-- Package format version - do not change -->
                             <Vaadin-Package-Version>1</Vaadin-Package-Version>
-                            <!--<Vaadin-Widgetsets>org.vaadin.addon.vodatime.Widgetset</Vaadin-Widgetsets>-->
                         </manifestEntries>
                     </archive>
                 </configuration>
