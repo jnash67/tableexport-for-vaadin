@@ -2,6 +2,7 @@ package com.vaadin.addon.tableexport.demo;
 
 import com.vaadin.addon.tableexport.ExcelExport;
 import com.vaadin.addon.tableexport.TableHolder;
+import com.vaadin.addon.tableexport.v7.DefaultTableHolder;
 import com.vaadin.v7.ui.Table;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -18,7 +19,7 @@ public class FontExampleExcelExport extends ExcelExport {
     }
 
     public FontExampleExcelExport(final Table table, final String sheetName) {
-        super(table, sheetName);
+        super(new DefaultTableHolder(table), sheetName);
         format();
     }
 

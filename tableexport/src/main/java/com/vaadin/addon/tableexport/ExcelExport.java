@@ -1,5 +1,16 @@
 package com.vaadin.addon.tableexport;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -16,16 +27,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.vaadin.ui.Grid;
 
 /**
  * The Class ExcelExport. Implementation of TableExport to export Vaadin Tables to Excel .xls files.
@@ -118,46 +120,46 @@ public class ExcelExport extends TableExport {
     protected Map<Object, String> propertyExcelFormatMap = new HashMap<Object, String>();
 
     /**
-     * At minimum, we need a Table to export. Everything else has default settings.
+     * At minimum, we need a Grid to export. Everything else has default settings.
      *
-     * @param table the table
+     * @param grid the grid
      */
-    public ExcelExport(final com.vaadin.v7.ui.Table table) {
-        this(table, null);
+    public ExcelExport(final Grid<?> grid) {
+        this(new DefaultGridHolder(grid), null);
     }
 
     /**
      * Instantiates a new TableExport class.
      *
-     * @param table     the table
+     * @param grid      the grid
      * @param sheetName the sheet name
      */
-    public ExcelExport(final com.vaadin.v7.ui.Table table, final String sheetName) {
-        this(table, sheetName, null);
+    public ExcelExport(final Grid<?> grid, final String sheetName) {
+        this(new DefaultGridHolder(grid), sheetName, null);
     }
 
     /**
      * Instantiates a new TableExport class.
      *
-     * @param table       the table
+     * @param grid         the grid
      * @param sheetName   the sheet name
      * @param reportTitle the report title
      */
-    public ExcelExport(final com.vaadin.v7.ui.Table table, final String sheetName, final String reportTitle) {
-        this(table, sheetName, reportTitle, null);
+    public ExcelExport(final Grid<?> grid, final String sheetName, final String reportTitle) {
+        this(new DefaultGridHolder(grid), sheetName, reportTitle, null);
     }
 
     /**
      * Instantiates a new TableExport class.
      *
-     * @param table          the table
+     * @param grid           the grid
      * @param sheetName      the sheet name
      * @param reportTitle    the report title
      * @param exportFileName the export file name
      */
-    public ExcelExport(final com.vaadin.v7.ui.Table table, final String sheetName, final String reportTitle,
+    public ExcelExport(final Grid<?> grid, final String sheetName, final String reportTitle,
                        final String exportFileName) {
-        this(table, sheetName, reportTitle, exportFileName, true);
+        this(new DefaultGridHolder(grid), sheetName, reportTitle, exportFileName, true);
     }
 
     /**
@@ -165,26 +167,24 @@ public class ExcelExport extends TableExport {
      * constructors end up calling. If the other constructors were called then they pass in the
      * default parameters.
      *
-     * @param table          the table
+     * @param grid           the grid
      * @param sheetName      the sheet name
      * @param reportTitle    the report title
      * @param exportFileName the export file name
      * @param hasTotalsRow   flag indicating whether we should create a totals row
      */
-    public ExcelExport(final com.vaadin.v7.ui.Table table, final String sheetName, final String reportTitle,
+    public ExcelExport(final Grid<?> grid, final String sheetName, final String reportTitle,
                        final String exportFileName, final boolean hasTotalsRow) {
-        this(table, new HSSFWorkbook(), sheetName, reportTitle, exportFileName, hasTotalsRow);
+        this(new DefaultGridHolder(grid), new HSSFWorkbook(), sheetName, reportTitle, exportFileName, hasTotalsRow);
     }
 
-    public ExcelExport(final com.vaadin.v7.ui.Table table, final Workbook wkbk, final String shtName, final String rptTitle,
+    public ExcelExport(final Grid<?> grid, final Workbook wkbk, final String shtName, final String rptTitle,
                        final String xptFileName, final boolean hasTotalsRow) {
-        super(table);
-        this.workbook = wkbk;
-        init(shtName, rptTitle, xptFileName, hasTotalsRow);
+        this(new DefaultGridHolder(grid), wkbk, shtName, rptTitle, xptFileName, hasTotalsRow);
     }
 
     /**
-     * At minimum, we need a Table to export. Everything else has default settings.
+     * At minimum, we need a TableHolder to export. Everything else has default settings.
      *
      * @param tableHolder the tableHolder
      */
@@ -291,14 +291,6 @@ public class ExcelExport extends TableExport {
         this.totalsIntegerCellStyle = defaultTotalsIntegerCellStyle(this.workbook);
         this.columnHeaderCellStyle = defaultHeaderCellStyle(this.workbook);
         this.titleCellStyle = defaultTitleCellStyle(this.workbook);
-    }
-
-    /*
-     * Set a new table to be exported in another workbook tab / sheet.
-     */
-    public void setNextTable(final com.vaadin.v7.ui.Table table, final String sheetName) {
-        setTable(table);
-        sheet = workbook.createSheet(sheetName);
     }
 
     public void setNextTableHolder(final TableHolder tableHolder, final String sheetName) {

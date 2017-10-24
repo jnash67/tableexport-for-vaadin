@@ -1,4 +1,4 @@
-package com.vaadin.addon.tableexport;
+package com.vaadin.addon.tableexport.v7;
 
 import com.vaadin.v7.data.Container;
 import com.vaadin.v7.data.Property;
@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @author thomas
  */
+@Deprecated
 public class DefaultTableHolder implements TableHolder {
 
     protected short defaultAlignment = CellStyle.ALIGN_LEFT;
