@@ -537,15 +537,9 @@ public class ExcelExport extends TableExport {
     protected int addDataRows(final Sheet sheetToAddTo, final int row) {
         final Collection<?> itemIds = getTableHolder().getItemIds();
         int localRow = row;
-        int count = 0;
         for (final Object itemId : itemIds) {
             addDataRow(sheetToAddTo, itemId, localRow);
-            count = 1;
-            if (count > 1) {
-                sheet.groupRow(localRow + 1, (localRow + count) - 1);
-                sheet.setRowGroupCollapsed(localRow + 1, true);
-            }
-            localRow = localRow + count;
+            localRow++;
         }
         return localRow;
     }
