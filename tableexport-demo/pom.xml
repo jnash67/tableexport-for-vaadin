@@ -20,14 +20,14 @@
 
     <properties>
         <tableexport.version>1.8.0</tableexport.version>
-        <vaadin.version>8.1.5</vaadin.version>
+        <vaadin.version>8.2.1</vaadin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
         <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
         <project.source.version>1.8</project.source.version>
         <project.target.version>1.8</project.target.version>
         <project.encoding>UTF-8</project.encoding>
         <commons-io.version>2.2</commons-io.version>
-        <apache-poi.version>3.13</apache-poi.version>
+        <apache-poi.version>3.17</apache-poi.version>
         <!-- plugins -->
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>

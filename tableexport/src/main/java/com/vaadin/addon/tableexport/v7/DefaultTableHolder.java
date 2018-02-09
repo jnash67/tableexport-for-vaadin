@@ -5,7 +5,7 @@ import com.vaadin.v7.data.Property;
 import com.vaadin.v7.ui.Grid;
 import com.vaadin.v7.ui.Table;
 import com.vaadin.ui.UI;
-import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,7 +17,7 @@ import java.util.List;
 @Deprecated
 public class DefaultTableHolder implements TableHolder {
 
-    protected short defaultAlignment = CellStyle.ALIGN_LEFT;
+    protected short defaultAlignment = HorizontalAlignment.LEFT.getCode();
 
     /**
      * Whether the Container is a HierarchicalContainer or an extension thereof.
@@ -92,11 +92,11 @@ public class DefaultTableHolder implements TableHolder {
 
     private Short vaadinAlignmentToCellAlignment(final Table.Align vaadinAlignment) {
         if (Table.Align.LEFT.equals(vaadinAlignment)) {
-            return CellStyle.ALIGN_LEFT;
+            return HorizontalAlignment.LEFT.getCode();
         } else if (Table.Align.RIGHT.equals(vaadinAlignment)) {
-            return CellStyle.ALIGN_RIGHT;
+            return HorizontalAlignment.RIGHT.getCode();
         } else {
-            return CellStyle.ALIGN_CENTER;
+            return HorizontalAlignment.CENTER.getCode();
         }
     }
 
