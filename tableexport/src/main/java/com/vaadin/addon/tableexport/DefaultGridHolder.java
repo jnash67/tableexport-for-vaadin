@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-
 import com.vaadin.data.HasHierarchicalDataProvider;
 import com.vaadin.data.provider.Query;
 import com.vaadin.server.SerializableFunction;
@@ -14,10 +12,11 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.Renderer;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 public class DefaultGridHolder implements TableHolder {
 
-    protected short defaultAlignment = CellStyle.ALIGN_LEFT;
+    protected short defaultAlignment = HorizontalAlignment.LEFT.getCode();
 
     private boolean hierarchical = false;
 
@@ -53,7 +52,7 @@ public class DefaultGridHolder implements TableHolder {
         Renderer<?> renderer = getRenderer(propId);
         if (renderer != null) {
             if (ExcelExport.isNumeric(renderer.getPresentationType())) {
-            	return CellStyle.ALIGN_RIGHT;
+            	return HorizontalAlignment.RIGHT.getCode();
             }
         }
         return defaultAlignment;

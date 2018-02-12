@@ -12,17 +12,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.PrintSetup;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
@@ -419,17 +409,17 @@ public class ExcelExport extends TableExport {
         titleCell.setCellStyle(titleCellStyle);
         // cell borders don't work on merged ranges so, if there are borders
         // we apply them to the merged range here.
-        if (titleCellStyle.getBorderLeft() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderLeft(titleCellStyle.getBorderLeft(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderLeft() != BorderStyle.NONE.getCode()) {
+            RegionUtil.setBorderLeft(titleCellStyle.getBorderLeft(), cra, sheet);
         }
-        if (titleCellStyle.getBorderRight() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderRight(titleCellStyle.getBorderRight(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderRight() != BorderStyle.NONE.getCode()) {
+            RegionUtil.setBorderRight(titleCellStyle.getBorderRight(), cra, sheet);
         }
-        if (titleCellStyle.getBorderTop() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderTop(titleCellStyle.getBorderTop(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderTop() != BorderStyle.NONE.getCode()) {
+            RegionUtil.setBorderTop(titleCellStyle.getBorderTop(), cra, sheet);
         }
-        if (titleCellStyle.getBorderBottom() != CellStyle.BORDER_NONE) {
-            RegionUtil.setBorderBottom(titleCellStyle.getBorderBottom(), cra, sheet, workbook);
+        if (titleCellStyle.getBorderBottom() != BorderStyle.NONE.getCode()) {
+            RegionUtil.setBorderBottom(titleCellStyle.getBorderBottom(), cra, sheet);
         }
         return 1;
     }
@@ -454,7 +444,7 @@ public class ExcelExport extends TableExport {
             headerCell.setCellStyle(getColumnHeaderStyle(row, col));
 
             final Short poiAlignment = getTableHolder().getCellAlignment(propId);
-            CellUtil.setAlignment(headerCell, workbook, poiAlignment);
+            CellUtil.setAlignment(headerCell, HorizontalAlignment.forInt(poiAlignment));
         }
     }
 
@@ -588,7 +578,7 @@ public class ExcelExport extends TableExport {
     protected void setupCell(Cell sheetCell, Object value, Class<?> valueType, Object propId, Object rootItemId, int row, int col) {
         sheetCell.setCellStyle(getCellStyle(propId, rootItemId, row, col, false));
         Short poiAlignment = getTableHolder().getCellAlignment(propId);
-        CellUtil.setAlignment(sheetCell, workbook, poiAlignment);
+        CellUtil.setAlignment(sheetCell, HorizontalAlignment.forInt(poiAlignment));
         setCellValue(sheetCell, value, valueType, propId);
     }
     
@@ -628,7 +618,7 @@ public class ExcelExport extends TableExport {
      * potentially relevant items that may be used to determine what formatting to return, that are
      * not accessible globally.
      *
-     * @param propertyId the property id
+     * @param propId     the property id
      * @param rootItemId the root item id
      * @param row        the row
      * @param col        the col
@@ -704,7 +694,7 @@ public class ExcelExport extends TableExport {
 	protected void setupTotalCell(Cell cell, final Object propId, final int currentRow, final int startRow, int col) {
 		cell.setCellStyle(getCellStyle(propId, currentRow, startRow, col, true));
 		Short poiAlignment = getTableHolder().getCellAlignment(propId);
-		CellUtil.setAlignment(cell, workbook, poiAlignment);
+		CellUtil.setAlignment(cell, HorizontalAlignment.forInt(poiAlignment));
 		Class<?> propType = getTableHolder().getPropertyType(propId);
 		if (isNumeric(propType)) {
 			CellRangeAddress cra = new CellRangeAddress(startRow, currentRow - 1, col, col);
@@ -768,10 +758,10 @@ public class ExcelExport extends TableExport {
         CellStyle style;
         final Font titleFont = wb.createFont();
         titleFont.setFontHeightInPoints((short) 18);
-        titleFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        titleFont.setBold(true);
         style = wb.createCellStyle();
-        style.setAlignment(CellStyle.ALIGN_CENTER);
-        style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFont(titleFont);
         return style;
     }
@@ -789,10 +779,10 @@ public class ExcelExport extends TableExport {
         monthFont.setFontHeightInPoints((short) 11);
         monthFont.setColor(IndexedColors.WHITE.getIndex());
         style = wb.createCellStyle();
-        style.setAlignment(CellStyle.ALIGN_CENTER);
-        style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setFont(monthFont);
         style.setWrapText(true);
         return style;
@@ -808,15 +798,15 @@ public class ExcelExport extends TableExport {
     protected CellStyle defaultDataCellStyle(final Workbook wb) {
         CellStyle style;
         style = wb.createCellStyle();
-        style.setAlignment(CellStyle.ALIGN_CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
         style.setWrapText(true);
-        style.setBorderRight(CellStyle.BORDER_THIN);
+        style.setBorderRight(BorderStyle.THIN);
         style.setRightBorderColor(IndexedColors.BLACK.getIndex());
-        style.setBorderLeft(CellStyle.BORDER_THIN);
+        style.setBorderLeft(BorderStyle.THIN);
         style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        style.setBorderTop(CellStyle.BORDER_THIN);
+        style.setBorderTop(BorderStyle.THIN);
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
-        style.setBorderBottom(CellStyle.BORDER_THIN);
+        style.setBorderBottom(BorderStyle.THIN);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
         style.setDataFormat(doubleDataFormat);
         return style;
@@ -832,10 +822,10 @@ public class ExcelExport extends TableExport {
     protected CellStyle defaultTotalsDoubleCellStyle(final Workbook wb) {
         CellStyle style;
         style = wb.createCellStyle();
-        style.setAlignment(CellStyle.ALIGN_CENTER);
-        style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setDataFormat(doubleDataFormat);
         return style;
     }
@@ -850,10 +840,10 @@ public class ExcelExport extends TableExport {
     protected CellStyle defaultTotalsIntegerCellStyle(final Workbook wb) {
         CellStyle style;
         style = wb.createCellStyle();
-        style.setAlignment(CellStyle.ALIGN_CENTER);
-        style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setDataFormat(integerDataFormat);
         return style;
     }
