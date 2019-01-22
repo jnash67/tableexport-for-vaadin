@@ -585,7 +585,7 @@ public class ExcelExport extends TableExport {
 	protected void setCellValue(Cell sheetCell, Object value, Class<?> valueType, Object propId) {
 		if (null != value) {
 		    if (!isNumeric(valueType)) {
-		        if (java.util.Date.class.isAssignableFrom(valueType)) {
+		        if (java.util.Date.class.isAssignableFrom(value.getClass())) {
 		            sheetCell.setCellValue((Date) value);
 		        } else {
 		            sheetCell.setCellValue(createHelper.createRichTextString(value.toString()));
