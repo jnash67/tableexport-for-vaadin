@@ -122,22 +122,25 @@ public class DefaultGridHolder implements TableHolder {
     	return null;
     }
 
+    /**
+     * The type of the cell: the class of the value it shows, or the presentation type of the renderer where there is
+     * no value or no item (totals row).
+     * (1.8.0 returned the class of the value provider here, so that no cell counted as numeric by its type, and
+     * String without an item, so that the totals row summed nothing.)
+     */
     @Override
     public Class<?> getPropertyType(Object itemId, Object propId) {
         Renderer<?> renderer = getRenderer(propId);
-        if (renderer != null && itemId != null) {
-            SerializableFunction valueProvider = getColumn(propId).getValueProvider();
-            Object columnValueProvider = valueProvider.apply(itemId);
-
-            if (columnValueProvider != null) {
-                return valueProvider.getClass();
-            }
-
-          return renderer.getPresentationType();
-
-        } else {
+        if (renderer == null) {
             return String.class;
         }
+        if (itemId != null) {
+            Object value = getPropertyValue(itemId, propId, false);
+            if (value != null) {
+                return value.getClass();
+            }
+        }
+        return renderer.getPresentationType();
     }
 
     @Override
