@@ -75,4 +75,13 @@ public class ExcelExportTest {
         assertEquals(HorizontalAlignment.RIGHT, row.getCell(1).getCellStyle().getAlignmentEnum());
     }
 
+    @Test
+    public void totalsRowSums() {
+        Sheet sheet = convert(grid(new Item("a", 1.0, null), new Item("b", 2.5, null)), true);
+        Row totals = sheet.getRow(3);
+        assertEquals("Total", totals.getCell(0).getStringCellValue());
+        // 1.8.0 failed here with a ClassCastException (the row number was passed as the item)
+        assertEquals(3.5, totals.getCell(1).getNumericCellValue(), 0);
+    }
+
 }
