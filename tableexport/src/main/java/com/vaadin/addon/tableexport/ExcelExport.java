@@ -743,7 +743,8 @@ public class ExcelExport extends TableExport {
     }
 
 	protected void setupTotalCell(Cell cell, final Object propId, final int currentRow, final int startRow, int col) {
-		cell.setCellStyle(getCellStyle(propId, currentRow, startRow, col, true));
+		// a totals cell belongs to no item
+		cell.setCellStyle(getCellStyle(propId, null, currentRow, col, true));
 		Short poiAlignment = getTableHolder().getCellAlignment(null, propId);
 		CellUtil.setAlignment(cell, HorizontalAlignment.forInt(poiAlignment));
 		Class<?> propType = getTableHolder().getPropertyType(null, propId);

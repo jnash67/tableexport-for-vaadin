@@ -80,6 +80,15 @@ class ExcelExportTest {
     }
 
     @Test
+    void writesTotals() {
+        Sheet sheet = convert(grid(List.of(new Item("a", 1.0), new Item("b", 2.5))), true);
+        Row totals = sheet.getRow(3);
+        assertEquals("Total", totals.getCell(0).getStringCellValue());
+        // 2.0.0 failed here with a ClassCastException (the row number was passed as the item)
+        assertEquals(3.5, totals.getCell(1).getNumericCellValue());
+    }
+
+    @Test
     void groupsTreeRows() {
         TreeGrid<Item> grid = new TreeGrid<>();
         DefaultGridHolder.exportable(grid.addHierarchyColumn(Item::name), Item::name, String.class).setHeader("Name")
