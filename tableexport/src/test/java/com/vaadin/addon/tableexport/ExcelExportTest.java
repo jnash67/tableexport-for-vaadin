@@ -68,10 +68,9 @@ class ExcelExportTest {
 
         Row first = sheet.getRow(1);
         assertEquals("a", first.getCell(0).getStringCellValue());
-        // as in 1.8.0: the cell type is the class of the value provider, so ExcelExport writes the number as text
-        // (fixed in 2.0.1)
-        assertEquals(CellType.STRING, first.getCell(1).getCellType());
-        assertEquals("1234.5", first.getCell(1).getStringCellValue());
+        // 2.0.0 wrote the number as text: the cell type was the class of the value provider
+        assertEquals(CellType.NUMERIC, first.getCell(1).getCellType());
+        assertEquals(1234.5, first.getCell(1).getNumericCellValue());
         assertEquals(HorizontalAlignment.RIGHT, first.getCell(1).getCellStyle().getAlignment());
 
         // an empty number cell stays empty, aligned by the presentation type

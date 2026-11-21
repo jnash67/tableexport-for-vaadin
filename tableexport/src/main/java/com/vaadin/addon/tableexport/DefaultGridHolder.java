@@ -197,24 +197,25 @@ public class DefaultGridHolder implements TableHolder {
     }
 
     /**
-     * As in 1.8.0: the class of the value provider where the cell has a value (so no cell counts as numeric by its
-     * type), the presentation type of the column where it has none, {@code String.class} without an item.
+     * The type of the cell: the class of its value, or the presentation type of the column where the value is
+     * {@code null} or there is no item (totals row); {@code String.class} for a column that is not exportable.
+     * <p>
+     * (1.8.0 and 2.0.0 returned the class of the value provider here, not of the value, so that no cell counted as
+     * numeric by its type, and {@code String.class} without an item, so that the totals row summed nothing.)
      */
     @Override
     public Class<?> getPropertyType(Object itemId, Object propId) {
         ExportValue exportValue = getExportValue(propId);
-        if (exportValue != null && itemId != null) {
-            Object value = exportValue.valueProvider.apply(itemId);
-
-            if (value != null) {
-                return exportValue.valueProvider.getClass();
-            }
-
-          return exportValue.presentationType;
-
-        } else {
+        if (exportValue == null) {
             return String.class;
         }
+        if (itemId != null) {
+            Object value = exportValue.valueProvider.apply(itemId);
+            if (value != null) {
+                return value.getClass();
+            }
+        }
+        return exportValue.presentationType;
     }
 
     @Override
