@@ -27,8 +27,8 @@ removed after the download); `convertTable()` alone builds the workbook (`getWor
 * `DefaultGridHolder`: columns are read by key and header text; the value of a cell comes from the value provider
   registered with `DefaultGridHolder.exportable(...)` (Vaadin 8: the column's value provider and, by reflection, its
   presentation provider).
-* Everything else behaves as in 1.8.0, including its three bugs (cell type is the class of the value provider,
-  totals row fails for grids, `java.util.Date` cells get their text); a follow-up pull request fixes them.
+* Everything else behaves as in 1.8.0, except for three of its bugs, fixed: the cell type is the class of the shown
+  value (was: of the value provider), the totals row works for grids, `java.util.Date` cells keep their date.
 
 ## Overview
 * Exporting data to Excel or CSV formats is a common task that comes up time and again. The solution can figured out from various forum posts but it takes a while to put everything together, especially the writing of the Excel file to the browser.
