@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
       <entry name="!?*.form" />
@@ -13,34 +12,25 @@
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-      <profile default="false" name="Annotation profile for tableexport-for-vaadin" enabled="true">
+      <profile name="Annotation profile for tableexport-for-vaadin (1)" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-      </profile>
-      <profile default="false" name="Annotation profile for tableexport-for-vaadin (1)" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
         <module name="tableexport-for-vaadin (1)" />
       </profile>
-      <profile default="false" name="Annotation profile for tableexport-for-vaadin-demo" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
+        <module name="tableexport-for-vaadin" />
         <module name="tableexport-for-vaadin-demo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="tableexport-for-vaadin" target="1.7" />
+      <module name="tableexport-for-vaadin" target="1.8" />
       <module name="tableexport-for-vaadin (1)" target="1.7" />
-      <module name="tableexport-for-vaadin-demo" target="1.7" />
+      <module name="tableexport-for-vaadin-demo" target="1.8" />
+      <module name="tableexport-for-vaadin-root" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
