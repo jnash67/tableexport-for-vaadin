@@ -84,4 +84,21 @@ public class ExcelExportTest {
         assertEquals(3.5, totals.getCell(1).getNumericCellValue(), 0);
     }
 
+    @Test
+    public void datesStayDates() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(2026, Calendar.NOVEMBER, 21);
+        Date date = calendar.getTime();
+        Grid<Item> grid = new Grid<>();
+        grid.addColumn(Item::getDate, new DateRenderer()).setCaption("Date").setId("date");
+        grid.setItems(new Item("a", null, date));
+
+        Sheet sheet = convert(grid, false);
+
+        // 1.8.0 overwrote the date with its text
+        assertEquals(CellType.NUMERIC, sheet.getRow(1).getCell(0).getCellTypeEnum());
+        assertEquals(date, sheet.getRow(1).getCell(0).getDateCellValue());
+    }
+
 }

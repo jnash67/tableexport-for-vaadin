@@ -613,11 +613,11 @@ public class ExcelExport extends TableExport {
 		        if (java.util.Date.class.isAssignableFrom(valueType)) {
 		            sheetCell.setCellValue((Date) value);
 		        }
-            if (java.time.LocalDate.class.isAssignableFrom(valueType)) {
+            else if (java.time.LocalDate.class.isAssignableFrom(valueType)) {
                 LocalDate lDate = (LocalDate) value;
                 sheetCell.setCellValue(Date.from(lDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
             }
-            if(java.time.LocalDateTime.class.isAssignableFrom(valueType)) {
+            else if(java.time.LocalDateTime.class.isAssignableFrom(valueType)) {
                 LocalDateTime lDateTime = (LocalDateTime) value;
                 sheetCell.setCellValue(Date.from(lDateTime.atZone(ZoneId.systemDefault()).toInstant()));
             }
