@@ -29,6 +29,8 @@
         <commons-io.version>2.2</commons-io.version>
         <apache-poi.version>3.17</apache-poi.version>
         <!-- plugins -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
         <maven-war-plugin.version>2.3</maven-war-plugin.version>

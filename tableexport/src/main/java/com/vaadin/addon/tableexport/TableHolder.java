@@ -15,7 +15,7 @@ public interface TableHolder extends Serializable {
     boolean isHierarchical();
     void setHierarchical(final boolean hierarchical);
 
-    Short getCellAlignment(Object propId);
+    Short getCellAlignment(Object itemId, Object propId);
     boolean isGeneratedColumn(final Object propId) throws IllegalArgumentException;
     Class<?> getPropertyTypeForGeneratedColumn(final Object propId) throws IllegalArgumentException;
 
@@ -25,7 +25,7 @@ public interface TableHolder extends Serializable {
     String getColumnHeader(Object propertyId);
     boolean isExportableFormattedProperty();
     
-    Class<?> getPropertyType(Object propId);
+    Class<?> getPropertyType(Object itemId, Object propId);
 
     Object getPropertyValue(Object itemId, Object propId, boolean useTableFormatPropertyValue);
 

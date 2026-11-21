@@ -1,15 +1,14 @@
 package com.vaadin.addon.tableexport.v7;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import com.vaadin.ui.UI;
 import com.vaadin.v7.data.Container;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.ui.Grid;
 import com.vaadin.v7.ui.Table;
-import com.vaadin.ui.UI;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author thomas
@@ -82,7 +81,7 @@ public class DefaultTableHolder implements TableHolder {
     }
 
     @Override
-    public Short getCellAlignment(Object propId) {
+    public Short getCellAlignment(Object itemId, Object propId) {
         if (null == heldTable) {
             return defaultAlignment;
         }
