@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011-2016 Jonathan Nash
+ * Modified 2026 by infraLeap (infraleap.com): ported to Vaadin Flow.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.vaadin.addon.tableexport;
 
 import java.io.File;
@@ -6,7 +22,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.vaadin.ui.UI;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.StreamRegistration;
 
 public abstract class TableExport implements Serializable {
 
@@ -78,13 +95,13 @@ public abstract class TableExport implements Serializable {
             final String exportFileName) {
         TemporaryFileDownloadResource resource;
         try {
-            resource =
-                    new TemporaryFileDownloadResource(app, exportFileName, mimeType, fileToExport);
-            if (null == app) {
-                UI.getCurrent().getPage().open(resource, null, false);
-            } else {
-                app.getPage().open(resource, null, false);
-            }
+            resource = new TemporaryFileDownloadResource(exportFileName, mimeType, fileToExport);
+            final UI ui = null == app ? UI.getCurrent() : app;
+            final StreamRegistration registration =
+                    ui.getSession().getResourceRegistry().registerResource(resource, ui.getElement());
+            resource.setRegistration(registration);
+            // the file comes as an attachment, so the browser stays on the page
+            ui.getPage().open(registration.getResourceUri().toString(), exportWindow);
         } catch (final FileNotFoundException e) {
             LOGGER.warning("Sending file to user failed with FileNotFoundException " + e);
             return false;

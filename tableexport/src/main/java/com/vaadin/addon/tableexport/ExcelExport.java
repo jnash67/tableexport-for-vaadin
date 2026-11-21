@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011-2016 Jonathan Nash
+ * Modified 2026 by infraLeap (infraleap.com): ported to Vaadin Flow.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.vaadin.addon.tableexport;
 
 import java.io.File;
@@ -17,6 +33,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -32,7 +49,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.RegionUtil;
-import com.vaadin.ui.Grid;
+import com.vaadin.flow.component.grid.Grid;
 
 /**
  * The Class ExcelExport. Implementation of TableExport to export Vaadin Tables to Excel .xls files.
@@ -423,16 +440,16 @@ public class ExcelExport extends TableExport {
         titleCell.setCellStyle(titleCellStyle);
         // cell borders don't work on merged ranges so, if there are borders
         // we apply them to the merged range here.
-        if (titleCellStyle.getBorderLeft() != BorderStyle.NONE.getCode()) {
+        if (titleCellStyle.getBorderLeft() != BorderStyle.NONE) {
             RegionUtil.setBorderLeft(titleCellStyle.getBorderLeft(), cra, sheet);
         }
-        if (titleCellStyle.getBorderRight() != BorderStyle.NONE.getCode()) {
+        if (titleCellStyle.getBorderRight() != BorderStyle.NONE) {
             RegionUtil.setBorderRight(titleCellStyle.getBorderRight(), cra, sheet);
         }
-        if (titleCellStyle.getBorderTop() != BorderStyle.NONE.getCode()) {
+        if (titleCellStyle.getBorderTop() != BorderStyle.NONE) {
             RegionUtil.setBorderTop(titleCellStyle.getBorderTop(), cra, sheet);
         }
-        if (titleCellStyle.getBorderBottom() != BorderStyle.NONE.getCode()) {
+        if (titleCellStyle.getBorderBottom() != BorderStyle.NONE) {
             RegionUtil.setBorderBottom(titleCellStyle.getBorderBottom(), cra, sheet);
         }
         return 1;
@@ -764,7 +781,7 @@ public class ExcelExport extends TableExport {
              */
             for (final Row r : sheet) {
                 for (final Cell c : r) {
-                    if (c.getCellType() == Cell.CELL_TYPE_FORMULA) {
+                    if (c.getCellType() == CellType.FORMULA) {
                         evaluator.evaluateInCell(c);
                     }
                 }
