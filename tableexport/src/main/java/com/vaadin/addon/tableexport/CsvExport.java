@@ -6,10 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
-
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-
 import com.vaadin.ui.Grid;
 
 public class CsvExport extends ExcelExport {
@@ -76,7 +75,7 @@ public class CsvExport extends ExcelExport {
             tempCsvFile = File.createTempFile("tmp", ".csv");
             final PrintStream p =
                     new PrintStream(new BufferedOutputStream(
-                            new FileOutputStream(tempCsvFile, true)));
+                            new FileOutputStream(tempCsvFile, true)), false, StandardCharsets.UTF_8.name());
 
             final XLS2CSVmra xls2csv = new XLS2CSVmra(fs, p, -1);
             xls2csv.process();

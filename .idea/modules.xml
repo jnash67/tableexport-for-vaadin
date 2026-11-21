@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/tableexport/tableexport-for-vaadin.iml" filepath="$PROJECT_DIR$/tableexport/tableexport-for-vaadin.iml" />
       <module fileurl="file://$PROJECT_DIR$/tableexport-demo/tableexport-for-vaadin-demo.iml" filepath="$PROJECT_DIR$/tableexport-demo/tableexport-for-vaadin-demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tableexport-for-vaadin-root.iml" filepath="$PROJECT_DIR$/tableexport-for-vaadin-root.iml" />
     </modules>
   </component>
 </project>

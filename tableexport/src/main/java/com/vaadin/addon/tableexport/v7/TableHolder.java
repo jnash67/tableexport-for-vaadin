@@ -16,7 +16,7 @@ public interface TableHolder extends com.vaadin.addon.tableexport.TableHolder {
 
     String getFormattedPropertyValue(Object rowId, Object colId, Property property);
 
-    default Class<?> getPropertyType(Object propId) {
+    default Class<?> getPropertyType(Object itemId, Object propId) {
         Class<?> classType;
         if (isGeneratedColumn(propId)) {
             classType = getPropertyTypeForGeneratedColumn(propId);

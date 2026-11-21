@@ -9,6 +9,11 @@
     <version>1.8.0</version>
     <name>TableExport Add-on Root</name>
 
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
 	<modules>
 		<module>tableexport</module>
 		<module>tableexport-demo</module>
