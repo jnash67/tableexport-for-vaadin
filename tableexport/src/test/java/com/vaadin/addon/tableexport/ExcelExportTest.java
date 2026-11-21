@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -86,6 +87,23 @@ class ExcelExportTest {
         assertEquals("Total", totals.getCell(0).getStringCellValue());
         // 2.0.0 failed here with a ClassCastException (the row number was passed as the item)
         assertEquals(3.5, totals.getCell(1).getNumericCellValue());
+    }
+
+    @Test
+    void writesDates() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(2026, Calendar.NOVEMBER, 21);
+        Date date = calendar.getTime();
+        Grid<Item> grid = new Grid<>();
+        DefaultGridHolder.addExportableColumn(grid, Item::date, Date.class).setHeader("Date").setKey("date");
+        grid.setItems(new Item("a", null, date, List.of()));
+
+        Sheet sheet = convert(grid, false);
+
+        // 2.0.0 overwrote the date with its text
+        assertEquals(CellType.NUMERIC, sheet.getRow(1).getCell(0).getCellType());
+        assertEquals(date, sheet.getRow(1).getCell(0).getDateCellValue());
     }
 
     @Test
